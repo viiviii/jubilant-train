@@ -1,9 +1,9 @@
-from lotto.lotto import go_login, login_input_boxs, login_button, alert
+from lotto.lotto import go_login, login_input_boxs, login_button, alert, go_lotto, layer_popup
 
 
-class LoginError(Exception):
-    def __init__(self, reason: str):
-        super().__init__(f'[로그인 실패] {reason}')
+class LottoError(Exception):
+    def __init__(self, reason: str, detail: str):
+        super().__init__(f'[{reason}] {detail}')
 
 
 # todo: 클라이언트에서 send_keys 사용성
@@ -17,9 +17,19 @@ def login(_id: str, password: str) -> None:
 
     login_button().click()
 
-    login_failure_alert = alert()
-    if login_failure_alert:
-        raise LoginError(reason=login_failure_alert.text)
+    # todo
+    failure_alert = alert()
+    if failure_alert:
+        raise LottoError(reason='로그인 실패', detail=failure_alert.text)
+
+
+def buy() -> None:
+    go_lotto()
+
+    # todo
+    failure_popup = layer_popup()
+    if failure_popup.is_displayed():
+        raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
 
 
 if __name__ == '__main__':
@@ -29,3 +39,4 @@ if __name__ == '__main__':
 
     # 시작
     login(_id, _password)
+    buy()

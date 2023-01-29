@@ -9,7 +9,10 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 _driver = webdriver.Chrome()
-_login_url = 'https://dhlottery.co.kr/user.do?method=login&returnUrl='
+
+# todo
+_base_url = 'https://dhlottery.co.kr'
+_login_url = f'{_base_url}/user.do?method=login'
 
 
 def go_login() -> None:
@@ -37,6 +40,10 @@ def alert() -> Optional[Alert]:
         return _driver.switch_to.alert
     except WebDriverException:
         return None
+
+
+def layer_popup() -> WebElement:
+    return _driver.find_element(By.CSS_SELECTOR, '#popupLayerAlert')
 
 
 # todo
