@@ -6,6 +6,7 @@ from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
 _driver = webdriver.Chrome()
@@ -44,6 +45,23 @@ def alert() -> Optional[Alert]:
 
 def layer_popup() -> WebElement:
     return _driver.find_element(By.CSS_SELECTOR, '#popupLayerAlert')
+
+
+def amount_select() -> Select:
+    return Select(_driver.find_element(By.CSS_SELECTOR, '#amoundApply'))
+
+
+def auto_checkbox() -> WebElement:
+    return _driver.find_element(By.CSS_SELECTOR, 'label[for="checkAutoSelect"]')
+
+
+def apply_button() -> WebElement:
+    return _driver.find_element(By.CSS_SELECTOR, '#btnSelectNum')
+
+
+def total_price() -> int:
+    element = _driver.find_element(By.CSS_SELECTOR, '#payAmt')
+    return int(element.text.replace(',', ''))
 
 
 # todo

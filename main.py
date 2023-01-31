@@ -1,4 +1,5 @@
-from lotto.lotto import go_login, login_input_boxs, login_button, alert, go_lotto, layer_popup
+from lotto.lotto import go_login, login_input_boxs, login_button, alert, go_lotto, layer_popup, amount_select, \
+    auto_checkbox, apply_button
 
 
 class LottoError(Exception):
@@ -23,13 +24,18 @@ def login(_id: str, password: str) -> None:
         raise LottoError(reason='로그인 실패', detail=failure_alert.text)
 
 
-def buy() -> None:
+def buy(amount: int) -> None:
     go_lotto()
 
     # todo
     failure_popup = layer_popup()
     if failure_popup.is_displayed():
         raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
+
+    amount_select().select_by_value(str(amount))
+    auto_checkbox().click()
+
+    apply_button().click()
 
 
 if __name__ == '__main__':
@@ -39,4 +45,4 @@ if __name__ == '__main__':
 
     # 시작
     login(_id, _password)
-    buy()
+    buy(amount=5)

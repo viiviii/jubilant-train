@@ -1,4 +1,5 @@
 from lotto.lotto import *
+from main import login
 
 
 def test_go_login():
@@ -20,3 +21,36 @@ def test_login_button():
     button = login_button()
     assert button
     assert button.accessible_name == '로그인'
+
+
+def test_amount_select():
+    login('my_id', 'my_password')  # todo
+    go_lotto()
+
+    select = amount_select()
+
+    assert select
+    assert len(select.options) == 5
+
+
+def test_auto_checkbox():
+    login('my_id', 'my_password')  # todo
+    go_lotto()
+
+    checkbox = auto_checkbox()
+    assert checkbox
+    assert not checkbox.is_selected()
+
+
+def test_apply_button():
+    login('my_id', 'my_password')  # todo
+    go_lotto()
+
+    assert apply_button()
+
+
+def test_total_price():
+    login('my_id', 'my_password')  # todo
+    go_lotto()
+
+    assert total_price() == 0
