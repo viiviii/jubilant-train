@@ -49,6 +49,27 @@ def test_apply_button():
     assert apply_button()
 
 
+def test_buy_button():
+    login('my_id', 'my_password')  # todo
+    go_lotto()
+
+    assert buy_button()
+
+
+# todo
+def test_confirm_button():
+    login('my_id', 'my_password')  # todo
+    go_lotto()
+    auto_checkbox().click()
+    apply_button().click()
+    buy_button().click()
+
+    confirm = confirm_button()
+
+    assert confirm
+    assert confirm.is_displayed()
+
+
 def test_total_price():
     login('my_id', 'my_password')  # todo
     go_lotto()

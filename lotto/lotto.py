@@ -59,6 +59,15 @@ def apply_button() -> WebElement:
     return _driver.find_element(By.CSS_SELECTOR, '#btnSelectNum')
 
 
+def buy_button() -> WebElement:
+    return _driver.find_element(By.CSS_SELECTOR, '#btnBuy')
+
+
+# todo
+def confirm_button() -> WebElement:
+    return _driver.find_element(By.CSS_SELECTOR, '#popupLayerConfirm input[value="확인"]')
+
+
 def total_price() -> int:
     element = _driver.find_element(By.CSS_SELECTOR, '#payAmt')
     return int(element.text.replace(',', ''))

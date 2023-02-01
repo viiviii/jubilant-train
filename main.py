@@ -1,5 +1,5 @@
 from lotto.lotto import go_login, login_input_boxs, login_button, alert, go_lotto, layer_popup, amount_select, \
-    auto_checkbox, apply_button
+    auto_checkbox, apply_button, buy_button, confirm_button
 
 
 class LottoError(Exception):
@@ -36,6 +36,14 @@ def buy(amount: int) -> None:
     auto_checkbox().click()
 
     apply_button().click()
+
+    buy_button().click()
+    confirm_button().click()
+
+    # todo
+    failure_popup = layer_popup()
+    if failure_popup.is_displayed():
+        raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
 
 
 if __name__ == '__main__':
