@@ -23,8 +23,8 @@ def test_login_button():
     assert button.accessible_name == '로그인'
 
 
-def test_amount_select():
-    login('my_id', 'my_password')  # todo
+def test_amount_select(account):
+    login(*account)  # todo
     go_lotto()
 
     select = amount_select()
@@ -33,8 +33,8 @@ def test_amount_select():
     assert len(select.options) == 5
 
 
-def test_auto_checkbox():
-    login('my_id', 'my_password')  # todo
+def test_auto_checkbox(account):
+    login(*account)  # todo
     go_lotto()
 
     checkbox = auto_checkbox()
@@ -42,23 +42,23 @@ def test_auto_checkbox():
     assert not checkbox.is_selected()
 
 
-def test_apply_button():
-    login('my_id', 'my_password')  # todo
+def test_apply_button(account):
+    login(*account)  # todo
     go_lotto()
 
     assert apply_button()
 
 
-def test_buy_button():
-    login('my_id', 'my_password')  # todo
+def test_buy_button(account):
+    login(*account)  # todo
     go_lotto()
 
     assert buy_button()
 
 
 # todo
-def test_confirm_button():
-    login('my_id', 'my_password')  # todo
+def test_confirm_button(account):
+    login(*account)  # todo
     go_lotto()
     auto_checkbox().click()
     apply_button().click()
@@ -70,8 +70,8 @@ def test_confirm_button():
     assert confirm.is_displayed()
 
 
-def test_total_price():
-    login('my_id', 'my_password')  # todo
+def test_total_price(account):
+    login(*account)  # todo
     go_lotto()
 
     assert total_price() == 0

@@ -9,8 +9,9 @@ def test_login_success():
     pass
 
 
-def test_buy():
-    login('my_id', 'my_password')  # todo
+# todo: 테스트 lotto로 이동하거나 제거
+def test_buy(account):
+    login(*account)  # todo
     go_lotto()
     buy(amount=5)
     assert total_price() == 5 * 1000
