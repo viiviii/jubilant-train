@@ -1,6 +1,14 @@
+from typing import Optional
+
+import pytest
 from _pytest.config.argparsing import Parser
 
 from lotto import account as lotto_account
+
+
+@pytest.fixture(scope='module')
+def account() -> tuple[str, Optional[str]]:
+    return lotto_account.account()
 
 
 def pytest_addoption(parser):
