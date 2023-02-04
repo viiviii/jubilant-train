@@ -1,4 +1,4 @@
-from lotto.account import account
+from lotto.account import Account, fetch_account
 from lotto.lotto import go_login, login_input_boxs, login_button, alert, go_lotto, layer_popup, amount_select, \
     auto_checkbox, apply_button, buy_button, confirm_button
 
@@ -10,14 +10,14 @@ class LottoError(Exception):
 
 # todo: 클라이언트에서 send_keys 사용성
 # todo: 로그인 성공/실패 기준 어떤걸로?
-def login(_id: str, password: str) -> None:
-    assert _id and password
+def login(account: Account) -> None:
+    assert account
 
     go_login()
     _id_box, password_box = login_input_boxs()
 
-    _id_box.send_keys(_id)
-    password_box.send_keys(password)
+    _id_box.send_keys(account.id)
+    password_box.send_keys(account.password)
 
     login_button().click()
 
@@ -50,5 +50,5 @@ def buy(amount: int) -> None:
 
 
 if __name__ == '__main__':
-    login(*account())
+    login(fetch_account())
     buy(amount=5)

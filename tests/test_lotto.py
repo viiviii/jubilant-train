@@ -24,7 +24,7 @@ def test_login_button():
 
 
 def test_amount_select(account):
-    login(*account)  # todo
+    login(account)  # todo
     go_lotto()
 
     select = amount_select()
@@ -34,7 +34,7 @@ def test_amount_select(account):
 
 
 def test_auto_checkbox(account):
-    login(*account)  # todo
+    login(account)  # todo
     go_lotto()
 
     checkbox = auto_checkbox()
@@ -43,14 +43,14 @@ def test_auto_checkbox(account):
 
 
 def test_apply_button(account):
-    login(*account)  # todo
+    login(account)  # todo
     go_lotto()
 
     assert apply_button()
 
 
 def test_buy_button(account):
-    login(*account)  # todo
+    login(account)  # todo
     go_lotto()
 
     assert buy_button()
@@ -58,7 +58,7 @@ def test_buy_button(account):
 
 # todo
 def test_confirm_button(account):
-    login(*account)  # todo
+    login(account)  # todo
     go_lotto()
     auto_checkbox().click()
     apply_button().click()
@@ -71,7 +71,7 @@ def test_confirm_button(account):
 
 
 def test_total_price(account):
-    login(*account)  # todo
+    login(account)  # todo
     go_lotto()
 
     assert total_price() == 0

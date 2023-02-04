@@ -8,9 +8,25 @@ ID_ARGUMENT_OPTIONS = {'type': str, 'help': '로또 사이트 계정 아이디'}
 KEYRING_SERVICE_NAME = 'lotto-purchase-keyring'
 
 
-def account() -> tuple[str, Optional[str]]:
+class Account(object):
+    def __init__(self, account_id: str, account_password: str) -> None:
+        self.id = account_id
+        self.password = account_password
+
+    def __str__(self) -> str:
+        def mask(string) -> str:
+            return '*' * len(string)
+
+        return f'id={self.id}, ' \
+               f'password={mask(self.password) if self.password else self.password}'
+
+    def __repr__(self) -> str:
+        return f'Account({self})'
+
+
+def fetch_account() -> Account:
     _id = _id_from_args()
-    return _id, _password_from_keyring(_id)
+    return Account(_id, _password_from_keyring(_id))
 
 
 def _id_from_args() -> str:
