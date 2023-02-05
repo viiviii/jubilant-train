@@ -5,7 +5,7 @@ from lotto import account as lotto_account
 from lotto.account import Account, fetch_account
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def account() -> Account:
     return fetch_account()
 
