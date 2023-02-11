@@ -1,7 +1,9 @@
+from datetime import date
+from itertools import zip_longest
 from typing import List, Optional
 
 from selenium import webdriver
-from selenium.common import WebDriverException
+from selenium.common import WebDriverException, NoSuchElementException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -76,3 +78,54 @@ def total_price() -> int:
 # todo
 def title() -> str:
     return _driver.title
+
+
+def go_my_buy(start_date: date, end_date: date) -> None:
+    fmt = '%Y%m%d'  # YYYYMMDD
+    _driver.get(f'{_base_url}/myPage.do?method=lottoBuyList'
+                f'&searchStartDate={start_date.strftime(fmt)}'
+                f'&searchEndDate={end_date.strftime(fmt)}'
+                f'&lottoId=&nowPage=1')  # 로또 게임 아이디=LO40
+
+
+def buy_results() -> List[dict[str, str]]:
+    headers = [th.text for th in _driver.find_elements(By.CSS_SELECTOR, '.tbl_data thead th')]
+    rows = _driver.find_elements(By.CSS_SELECTOR, '.tbl_data tbody tr')
+
+    buys = []
+    for row in rows:
+        tds = row.find_elements(By.TAG_NAME, 'td')
+        buys.append(dict(zip_longest(headers, [td.text for td in tds], fillvalue='')))
+
+    return buys
+
+
+def total_buy_result(buys: List[dict[str, str]]) -> dict[str, int]:
+    amount = [extract_amount(lottery['당첨금']) for lottery in buys]
+    count = [int(lottery['구입매수'] or 0) for lottery in buys]
+    unpick = [int(lottery['구입매수'] or 0) for lottery in buys if lottery['당첨결과'] == '미추첨']
+
+    return {
+        '총 당첨금': sum(amount),
+        '총 구입매수': sum(count),
+        '미추첨': sum(unpick),
+    }
+
+
+def extract_amount(value: str) -> int:
+    if not value or value == '-':
+        return 0
+
+    return int(''.join(filter(str.isdigit, value)))
+
+
+# todo
+def no_data_message() -> Optional[str]:
+    """메세지 종류:
+        로그인 후 이용이 가능합니다.
+        조회 결과가 없습니다.
+    """
+    try:
+        return _driver.find_element(By.CSS_SELECTOR, '.nodata').text
+    except NoSuchElementException:
+        return None
