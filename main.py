@@ -1,3 +1,4 @@
+from datetime import timedelta
 from textwrap import dedent
 from typing import Any
 
@@ -69,8 +70,16 @@ def to_message(result: dict[str, Any]) -> str:
     📅 조회기간: {result["시작일"].strftime("%y-%m-%d")} ~ {result["종료일"].strftime("%y-%m-%d")}''')
 
 
+def last_sunday(today: date) -> date:
+    days_in_week = 7
+    pass_days_in_last_week = len(['일요일'])
+    pass_days = (today.weekday() + pass_days_in_last_week) % days_in_week
+
+    return today - timedelta(days=pass_days)
+
+
 if __name__ == '__main__':
     login(fetch_account())
     buy(amount=1)
-    result = check_lottery_result(start_date=date.today(), end_date=date.today())
+    result = check_lottery_result(start_date=last_sunday(date.today()), end_date=date.today())
     print(to_message(result))

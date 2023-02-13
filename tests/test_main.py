@@ -51,3 +51,11 @@ def test_to_message():
         '💰 총 당첨금: 1,234,567원\n'
         '✅ 총 구입매수: 11장 (미추첨 0장)\n'
         '📅 조회기간: 20-01-01 ~ 21-11-28')
+
+
+def test_last_sunday():
+    sunday = date(2023, 1, 1)
+    monday = date(2023, 1, 2)
+
+    assert last_sunday(today=monday) == sunday
+    assert last_sunday(today=sunday) == sunday
