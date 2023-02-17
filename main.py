@@ -4,6 +4,9 @@ from typing import Any
 
 from lotto.account import Account, fetch_account
 from lotto.lotto import *
+from lotto.secret import Secret
+from sends.send import Send
+from sends.send_github_issue import SendGithubIssue
 
 
 class LottoError(Exception):
@@ -80,6 +83,11 @@ def last_sunday(today: date) -> date:
 
 if __name__ == '__main__':
     login(fetch_account())
-    buy(amount=1)
-    result = check_lottery_result(start_date=last_sunday(date.today()), end_date=date.today())
-    print(to_message(result))
+    # buy(amount=1)
+    lottery_result = check_lottery_result(start_date=last_sunday(date.today()), end_date=date.today())
+    send: Send = SendGithubIssue(
+        token=Secret('ghp_'),
+        repository='viiviii/jubilant-train'
+    )
+    send(title='🎊 로또6/45 1055회(23-02-18)',  # todo: title 하드 코딩 제거
+         content=to_message(lottery_result))
