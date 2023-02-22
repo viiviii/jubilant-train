@@ -1,31 +1,12 @@
-from abc import ABCMeta, abstractmethod
+from datetime import date
 from typing import Any
 
-from lotto.account import Account
-from lotto.lotto import *
+from lotto.lotto import Account
+from lotto.lotto import Lotto, LottoError
+from lotto.lotto_site_page import LoginPage, alert, LottoPage, MyBuyPage
 
 
-class Lotto(metaclass=ABCMeta):
-
-    @abstractmethod
-    def login(self, account: Account) -> None:
-        pass
-
-    @abstractmethod
-    def buy(self, amount: int) -> int:
-        pass
-
-    @abstractmethod
-    def result(self, start: date, end: date) -> dict[str, Any]:
-        pass
-
-
-class LottoError(Exception):
-    def __init__(self, reason: str, detail: str):
-        super().__init__(f'[{reason}] {detail}')
-
-
-class LottoWebsite(Lotto):
+class LottoSite(Lotto):
 
     def login(self, account: Account) -> None:
         page = LoginPage()

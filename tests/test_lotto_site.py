@@ -1,11 +1,12 @@
 import pytest
 
-from main import *
+from lotto.lotto import *
+from lotto.lotto_site import LottoSite
 
 
 @pytest.fixture(scope='class')
 def lotto() -> Lotto:
-    return LottoWebsite()
+    return LottoSite()
 
 
 class TestSuccess:

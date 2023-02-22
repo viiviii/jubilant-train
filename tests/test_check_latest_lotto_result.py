@@ -2,8 +2,8 @@ from datetime import date
 from typing import Any
 
 from check_latest_lotto_result import to_content, last_sunday, check_latest_lotto_result, DateRange, to_title
-from lotto.account import Account
-from main import Lotto
+from lotto.lotto import Account
+from lotto.lotto import Lotto
 from sends.send import Send, SendResult
 
 
