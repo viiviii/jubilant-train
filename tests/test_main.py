@@ -1,40 +1,38 @@
-from datetime import datetime
-
 import pytest
 
 from main import *
 
 
+@pytest.fixture(scope='class')
+def lotto() -> Lotto:
+    return LottoWebsite()
+
+
 class TestSuccess:
 
-    def test_login(self, account):
-        login(account)  # todo
-        # todo: 로그인 유무 어떻게 체크?
+    # todo: 로그인 유무 어떻게 체크?
+    def test_login(self, lotto, account):
+        lotto.login(account)
 
     # todo: 테스트 돌릴 때마다 진짜 살거니?
-    # todo: 진짜 살거면 설정 추가하거나 buy, select로 기능 나누기
-    def test_buy(self):
-        buy(amount=5)
-        assert total_price() == 5 * 1000
+    def test_buy(self, lotto):
+        assert lotto.buy(amount=5) == 5 * 1000
 
-    def test_check_lottery_result(self):
-        today = datetime.today()
-        result = check_lottery_result(start_date=today, end_date=today)
-        assert result['시작일'] == today
-        assert result['종료일'] == today
-        assert result['총 당첨금'] >= 0
-        assert result['총 구입매수'] >= 0
-        assert result['미추첨'] >= 0
+    # todo: no-data는 1) 로그인하지 않았을 때, 2)구매 이력이 없을 떄 두가지임
+    def test_result(self, lotto):
+        assert lotto.result(start=date.today(), end=date.today())
 
 
-# todo: 아 여긴 진짜 격리해야겠다
 class TestFailure:
 
-    def test_login_failure_when_invalid_account(self):
-        with pytest.raises(LottoError, match='[로그인 실패] *'):
-            invalid_account = Account('invalid125id', 'invalid@password')
-            login(invalid_account)
+    def test_login_failure_when_invalid_account(self, lotto):
+        with pytest.raises(LottoError, match='로그인 실패'):
+            lotto.login(Account('invalid125id', 'invalid@password'))
 
-    def test_buy_failure_when_not_logged_in(self):
-        with pytest.raises(LottoError, match='[로또 구매 실패] *'):
-            buy(amount=1)
+    def test_buy_failure_when_not_logged_in(self, lotto):
+        with pytest.raises(LottoError, match='로또 구매 실패'):
+            lotto.buy(amount=1)
+
+    def test_failure_lotto_result_when_not_logged_in(self, lotto):
+        with pytest.raises(LottoError, match='당첨 조회 실패'):
+            lotto.result(start=date.today(), end=date.today())

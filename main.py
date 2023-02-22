@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any
 
-from lotto.account import Account, fetch_account
+from lotto.account import Account
 from lotto.lotto import *
 
 
@@ -25,58 +25,53 @@ class LottoError(Exception):
         super().__init__(f'[{reason}] {detail}')
 
 
-# todo: 클라이언트에서 send_keys 사용성
-# todo: 로그인 성공/실패 기준 어떤걸로?
-def login(account: Account) -> None:
-    assert account
+class LottoWebsite(Lotto):
 
-    go_login()
-    _id_box, password_box = login_input_boxs()
+    def login(self, account: Account) -> None:
+        assert account
 
-    _id_box.send_keys(account.id)
-    password_box.send_keys(account.password)
+        go_login()
+        _id_box, password_box = login_input_boxs()
 
-    login_button().click()
+        _id_box.send_keys(account.id)
+        password_box.send_keys(account.password)
 
-    # todo
-    failure_alert = alert()
-    if failure_alert:
-        raise LottoError(reason='로그인 실패', detail=failure_alert.text)
+        login_button().click()
 
+        # todo
+        failure_alert = alert()
+        if failure_alert:
+            raise LottoError(reason='로그인 실패', detail=failure_alert.text)
 
-def buy(amount: int) -> None:
-    go_lotto()
+    def buy(self, amount: int) -> int:
+        go_lotto()
 
-    # todo
-    failure_popup = layer_popup()
-    if failure_popup.is_displayed():
-        raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
+        # todo
+        failure_popup = layer_popup()
+        if failure_popup.is_displayed():
+            raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
 
-    amount_select().select_by_value(str(amount))
-    auto_checkbox().click()
+        amount_select().select_by_value(str(amount))
+        auto_checkbox().click()
 
-    apply_button().click()
+        apply_button().click()
 
-    buy_button().click()
-    confirm_button().click()
+        buy_button().click()
+        confirm_button().click()
 
-    # todo
-    failure_popup = layer_popup()
-    if failure_popup.is_displayed():
-        raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
+        # todo
+        failure_popup = layer_popup()
+        if failure_popup.is_displayed():
+            raise LottoError(reason='로또 구매 실패', detail=failure_popup.text)
 
+        return total_price()
 
-def check_lottery_result(start_date: date, end_date: date) -> dict[str, int]:
-    go_my_buy(start_date=start_date, end_date=end_date)
+    def result(self, start: date, end: date) -> dict[str, Any]:
+        go_my_buy(start_date=start, end_date=end)
 
-    # todo
-    failure_message = no_data_message()
-    if failure_message:
-        raise LottoError(reason='당첨 조회 실패', detail=failure_message)
+        # todo
+        failure_message = no_data_message()
+        if failure_message:
+            raise LottoError(reason='당첨 조회 실패', detail=failure_message)
 
-    return {'시작일': start_date, '종료일': end_date} | total_buy_result(buy_results())
-
-
-if __name__ == '__main__':
-    login(fetch_account())
-    # buy(amount=1)
+        return {'조회 시작일': start, '조회 종료일': end} | total_buy_result(buy_results())

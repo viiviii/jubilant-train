@@ -1,7 +1,12 @@
 import pytest
 
 from lotto.lotto import *
-from main import login
+from main import LottoWebsite
+
+
+@pytest.fixture(scope='class')
+def login(account) -> None:
+    LottoWebsite().login(account)
 
 
 class TestLoginPage:
@@ -30,9 +35,7 @@ class TestLoginPage:
 class TestLottoPage:
 
     @pytest.fixture(scope='class', autouse=True)
-    def setup(self, account):
-        go_login()
-        login(account)
+    def setup(self, login):
         go_lotto()
 
     def test_auto_checkbox(self):
@@ -61,9 +64,7 @@ class TestMyBuyPage:
 
         assert '로그인 후 이용' in no_data_message()
 
-    def test_buy_results(self, account):
-        go_login()
-        login(account)
+    def test_buy_results(self, login):
         go_my_buy(*self.searching_date_range)
 
         results = buy_results()
