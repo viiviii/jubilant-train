@@ -1,12 +1,14 @@
 from datetime import date, timedelta
 from textwrap import dedent
-from typing import Any
+from typing import NamedTuple
 
 from lotto.account import Account, fetch_account
 from lotto.secret import Secret
-from main import login, check_lottery_result
+from main import Lotto
 from sends.send import Send, SendResult
 from sends.send_github_issue import SendGithubIssue
+
+DateRange = NamedTuple('DateRange', [('start', date), ('end', date)])
 
 
 def last_sunday(today: date) -> date:
@@ -17,22 +19,29 @@ def last_sunday(today: date) -> date:
     return today - timedelta(days=pass_days)
 
 
-def to_message(result: dict[str, Any]) -> str:
+def to_title(name: str, rounds: str, draw_date: date):
+    return f'🎊 {name} {rounds}회({draw_date.isoformat()})'
+
+
+def to_content(total_amount: int, search_dates: DateRange) -> str:
     return dedent(f'''\
-    💰 총 당첨금: {"{:,}".format(result["총 당첨금"])}원
-    ✅ 총 구입매수: {result["총 구입매수"]}장 (미추첨 {result["미추첨"]}장)
-    📅 조회기간: {result["시작일"].strftime("%y-%m-%d")} ~ {result["종료일"].strftime("%y-%m-%d")}''')
+    💰 총 당첨금: {"{:,}".format(total_amount)}원
+    📅 조회기간: {search_dates.start.strftime("%y-%m-%d")} ~ {search_dates.end.strftime("%y-%m-%d")}''')
 
 
-def check_latest_lotto_result(account: Account, send: Send) -> SendResult:
-    login(account)
-    lottery_result = check_lottery_result(start_date=last_sunday(date.today()), end_date=date.today())
-    return send(title='🎊 로또6/45 1055회(23-02-18)',  # todo: title 하드 코딩 제거
-                content=to_message(lottery_result))
+def check_latest_lotto_result(account: Account, lotto: Lotto, send: Send, search_dates: DateRange) -> SendResult:
+    lotto.login(account)
+    buys = lotto.result(*search_dates)
+    return send(title=to_title(name=buys['복권명'], rounds=buys['회차'], draw_date=buys['추첨일']),  # todo: title 하드 코딩 제거
+                content=to_content(
+                    total_amount=buys['총 당첨금'],
+                    search_dates=DateRange(buys['조회 시작일'], buys['조회 종료일'])))
 
 
 if __name__ == '__main__':
     check_latest_lotto_result(
         account=fetch_account(),
-        send=SendGithubIssue(token=Secret('ghp_'), repository='viiviii/jubilant-train')  # todo: 하드코딩
+        lotto=None,  # todo
+        send=SendGithubIssue(token=Secret('ghp_'), repository='viiviii/jubilant-train'),  # todo: 하드코딩
+        search_dates=(last_sunday(date.today()), date.today())  # todo: 일요일~토요일로 변경하기
     )

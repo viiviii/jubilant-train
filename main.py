@@ -1,5 +1,23 @@
+from abc import ABCMeta, abstractmethod
+from typing import Any
+
 from lotto.account import Account, fetch_account
 from lotto.lotto import *
+
+
+class Lotto(metaclass=ABCMeta):
+
+    @abstractmethod
+    def login(self, account: Account) -> None:
+        pass
+
+    @abstractmethod
+    def buy(self, amount: int) -> int:
+        pass
+
+    @abstractmethod
+    def result(self, start: date, end: date) -> dict[str, Any]:
+        pass
 
 
 class LottoError(Exception):
