@@ -1,130 +1,103 @@
-from datetime import date
-
 import pytest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-from lotto.lotto_site import LottoSite
-from lotto.lotto_site_page import LoginPage, title, LottoPage, MyBuyPage
+from lotto.lotto_site_page import LoginPage, LottoPage, MyBuyPage, Selector
 
 
 @pytest.fixture(scope='class')
-def login(account) -> None:
-    LottoSite().login(account)
+def driver():
+    _driver = webdriver.Chrome()
+    yield _driver
+    _driver.quit()
 
 
-class TestLoginPage:
+@pytest.fixture(scope='class')
+def find_element(driver):
+    return lambda selector: driver.find_element(**selector)
+
+
+@pytest.fixture(scope='class')
+def find_elements(driver):
+    return lambda selector: driver.find_elements(**selector)
+
+
+@pytest.fixture(scope='class')
+def login(driver, account):
+    _page = LoginPage(driver)
+    _page.go()
+    _page.login(account)
+
+
+class TestLoginPageElements:
 
     @pytest.fixture(scope='class')
-    def page(self):
-        return LoginPage()
+    def page(self, driver):
+        return LoginPage(driver)
 
     @pytest.fixture(scope='class', autouse=True)
     def setup(self, page):
-        page.go_login()
+        page.go()
 
-    def test_page_title(self):
-        page_title = title()
-        assert '동행복권' in page_title
-        assert '로그인' in page_title
+    def test_account_inputs(self, page, find_elements):
+        elements = find_elements(page.By.ACCOUNT_INPUTS)
 
-    def test_login_input_boxs(self, page):
-        boxs = page.login_input_boxs()
-        assert len(boxs) == 2
-        assert boxs[0].accessible_name == '아이디'
-        assert boxs[1].accessible_name == '비밀번호'
+        assert len(elements) == 2
+        assert elements[0].accessible_name == '아이디'
+        assert elements[1].accessible_name == '비밀번호'
 
-    def test_login_button(self, page):
-        button = page.login_button()
-        assert button
-        assert button.accessible_name == '로그인'
+    def test_login_button(self, page, find_element):
+        element = find_element(page.By.LOGIN_BUTTON)
+
+        assert element
+        assert element.accessible_name == '로그인'
 
 
-class TestLottoPage:
+class TestLottoPageElements:
 
     @pytest.fixture(scope='class')
-    def page(self):
-        return LottoPage()
+    def page(self, driver):
+        return LottoPage(driver)
 
     @pytest.fixture(scope='class', autouse=True)
-    def setup(self, page, login):
-        page.go_lotto()
+    def setup(self, login, page):
+        page.go()
 
-    def test_auto_checkbox(self, page):
-        assert page.auto_checkbox()
+    def test_auto_checkbox(self, page, find_element):
+        assert find_element(page.By.AUTO_CHECKBOX)
 
-    def test_amount_select(self, page):
-        select = page.amount_select()
-        assert select
-        assert len(select.options) == 5
+    def test_quantity_select(self, page, find_element):
+        assert find_element(page.By.QUANTITY_SELECT)
 
-    def test_apply_button(self, page):
-        assert page.apply_button()
+    def test_apply_button(self, page, find_element):
+        assert find_element(page.By.APPLY_BUTTON)
 
-    def test_buy_button(self, page):
-        assert page.buy_button()
+    def test_buy_button(self, page, find_element):
+        assert find_element(page.By.BUY_BUTTON)
 
-    def test_confirm_button(self, page):
-        assert page.confirm_button()
+    def test_buy_confirm_button(self, page, find_element):
+        assert find_element(page.By.BUY_CONFIRM_BUTTON)
 
 
-class TestMyBuyPage:
-    searching_date_range = date(2023, 1, 1), date(2023, 1, 1)
+class TestMyBuyPageElements:
 
     @pytest.fixture(scope='class')
-    def page(self):
-        return MyBuyPage()
+    def page(self, driver):
+        return MyBuyPage(driver)
 
-    # todo: 로그인 안했을 때 실패 테스트 어디서 할까 -> 현재 중복되어 있음
-    def test_failure_message(self, page):
-        page.go_my_buy(*self.searching_date_range)
+    @pytest.fixture(scope='class', autouse=True)
+    def setup(self, login, page):
+        page.go()
 
-        assert '로그인 후 이용' in page.no_data_message()
+    def test_table_header(self, page, find_element):
+        assert find_element(page.By.TABLE_HEADER)
 
-    def test_buy_results(self, page, login):
-        page.go_my_buy(*self.searching_date_range)
+    def test_table_row(self, page, find_element):
+        assert find_element(page.By.TABLE_ROW)
 
-        results = page.buy_results()
 
-        assert results
-        assert '복권명' in results[0]
-        assert '당첨금' in results[0]
-        assert '당첨결과' in results[0]
-        assert '구입매수' in results[0]
+def test_element():
+    element = Selector(value='#id .class', description='테스트 아이디')
 
-    def test_total_buy_result_when_not_buy(self, page):
-        buys = [{'구입일자': '조회 결과가 없습니다.', '복권명': '', '회차': '', '선택번호/복권번호': '',
-                 '구입매수': '', '당첨결과': '', '당첨금': '', '추첨일': ''}]
-
-        assert page.total_buy_result(buys) == {
-            '총 당첨금': 0,
-            '총 구입매수': 0,
-            '미추첨': 0,
-        }
-
-    def test_total_buy_result_when_buy(self, page):
-        buys = [
-            {'구입일자': '2023-02-07', '복권명': '로또6/45', '회차': '1054', '선택번호/복권번호': '51738 11491 27411 72232 76893 71219',
-             '구입매수': '5', '당첨결과': '미추첨', '당첨금': '-', '추첨일': '2023-02-11'},
-            {'구입일자': '2023-02-06', '복권명': '로또6/45', '회차': '1054', '선택번호/복권번호': '51711 11490 27422 87222 61893 52349',
-             '구입매수': '2', '당첨결과': '미추첨', '당첨금': '-', '추첨일': '2023-02-11'},
-            {'구입일자': '2023-02-04', '복권명': '로또6/45', '회차': '1053', '선택번호/복권번호': '50012 91499 11223 13078 41298 32090',
-             '구입매수': '1', '당첨결과': '당첨', '당첨금': '50,000원', '추첨일': '2023-02-04'},
-            {'구입일자': '2023-02-04', '복권명': '로또6/45', '회차': '1053', '선택번호/복권번호': '59912 84214 07899 86707 14326 52110',
-             '구입매수': '2', '당첨결과': '낙첨', '당첨금': '-', '추첨일': '2023-02-04'},
-            {'구입일자': '2023-02-04', '복권명': '로또6/45', '회차': '1053', '선택번호/복권번호': '61234 23524 25931 66317 64326 62190',
-             '구입매수': '5', '당첨결과': '당첨', '당첨금': '5,000원', '추첨일': '2023-02-04'},
-            {'구입일자': '2023-01-01', '복권명': '연금복권720', '회차': '90', '선택번호/복권번호': '5조000011',
-             '구입매수': '2', '당첨결과': '낙첨', '당첨금': '-', '추첨일': '2022-08-25'},
-        ]
-
-        assert page.total_buy_result(buys) == {
-            '총 당첨금': 55000,
-            '총 구입매수': 17,
-            '미추첨': 7,
-        }
-
-    def test_extract_amount(self, page):
-        assert page.extract_amount('-') == 0
-        assert page.extract_amount('') == 0
-        assert page.extract_amount('0원') == 0
-        assert page.extract_amount('5,000원') == 5000
-        assert page.extract_amount('1,234,567원') == 1234567
+    assert element == {'by': By.CSS_SELECTOR, 'value': '#id .class'}
+    assert element.description == '테스트 아이디'

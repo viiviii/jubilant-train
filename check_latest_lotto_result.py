@@ -2,6 +2,8 @@ from datetime import date, timedelta
 from textwrap import dedent
 from typing import NamedTuple
 
+from selenium import webdriver
+
 from lotto.account import Account, fetch_account
 from lotto.lotto import Lotto
 from lotto.lotto_site import LottoSite
@@ -42,7 +44,7 @@ def check_latest_lotto_result(account: Account, lotto: Lotto, send: Send, search
 if __name__ == '__main__':
     check_latest_lotto_result(
         account=fetch_account(),
-        lotto=LottoSite(),
+        lotto=LottoSite(driver=webdriver.Chrome()),
         send=SendGithubIssue(token=Secret('ghp_'), repository='viiviii/jubilant-train'),  # todo: 하드코딩
         search_dates=(last_sunday(date.today()), date.today())  # todo: 일요일~토요일로 변경하기
     )
