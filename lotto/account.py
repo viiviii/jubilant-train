@@ -3,7 +3,22 @@ from typing import Optional
 
 import keyring
 
-from lotto.lotto import Account
+
+class Account(object):
+    def __init__(self, account_id: str, password: str) -> None:
+        self.id = account_id
+        self.password = password
+
+    def __str__(self) -> str:
+        def mask(string) -> str:
+            return '*' * len(string)
+
+        return f'id={self.id}, ' \
+               f'password={mask(self.password) if self.password else self.password}'
+
+    def __repr__(self) -> str:
+        return f'Account({self})'
+
 
 ID_ARGUMENT_NAME = '--id'
 ID_ARGUMENT_OPTIONS = {'type': str, 'help': '로또 사이트 계정 아이디'}

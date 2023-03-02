@@ -1,7 +1,15 @@
 import pytest
 from _pytest.config.argparsing import Parser
+from selenium import webdriver
 
 from lotto.account import Account, fetch_account, ID_ARGUMENT_OPTIONS, ID_ARGUMENT_NAME
+
+
+@pytest.fixture(scope='class')
+def driver():
+    _driver = webdriver.Chrome()
+    yield _driver
+    _driver.quit()
 
 
 @pytest.fixture(scope='session')

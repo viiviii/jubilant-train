@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from itertools import zip_longest
-from typing import List, Optional
+from typing import Optional, List
 
 from selenium.common import NoSuchElementException, WebDriverException
 from selenium.webdriver.common.alert import Alert
@@ -11,7 +11,8 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
-from lotto.lotto import Account, LottoError
+from lotto.account import Account
+from lotto.lotto import LottoError
 from lotto.types import DateRange
 
 

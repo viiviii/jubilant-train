@@ -1,22 +1,14 @@
 from datetime import date
 
 import pytest
-from selenium import webdriver
 
 from lotto.lotto import *
-from lotto.lotto_site import LottoSite
-
-
-@pytest.fixture(scope='class')
-def driver():
-    _driver = webdriver.Chrome()
-    yield _driver
-    _driver.quit()
+from lotto.site.site import Site
 
 
 @pytest.fixture(scope='class')
 def lotto(driver) -> Lotto:
-    return LottoSite(driver)
+    return Site(driver)
 
 
 # todo: 이거 진짜 돌릴거면 마커 달아놔라

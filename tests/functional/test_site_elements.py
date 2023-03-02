@@ -1,15 +1,7 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from lotto.lotto_site_page import LoginPage, LottoPage, MyBuyPage, Selector, Table
-
-
-@pytest.fixture(scope='class')
-def driver():
-    _driver = webdriver.Chrome()
-    yield _driver
-    _driver.quit()
+from lotto.site.pages import LoginPage, LottoPage, MyBuyPage, Selector, Table
 
 
 @pytest.fixture(scope='class')

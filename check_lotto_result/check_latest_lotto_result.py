@@ -4,10 +4,10 @@ from selenium import webdriver
 
 from check_lotto_result import message
 from check_lotto_result.summary import group_by_round
-from lotto.account import Account, fetch_account
+from lotto.account import fetch_account, Account
 from lotto.lotto import Lotto
-from lotto.lotto_site import LottoSite
 from lotto.secret import Secret
+from lotto.site.site import Site
 from lotto.types import DateRange
 from sends.send import Send, SendResult
 from sends.send_github_issue import SendGithubIssue
@@ -32,7 +32,7 @@ def check_latest_lotto_result(account: Account, lotto: Lotto, send: Send, search
 if __name__ == '__main__':
     check_latest_lotto_result(
         account=fetch_account(),
-        lotto=LottoSite(driver=webdriver.Chrome()),
+        lotto=Site(driver=webdriver.Chrome()),
         send=SendGithubIssue(token=Secret('ghp_'), repository='viiviii/jubilant-train'),  # todo: 하드코딩
         search_dates=DateRange(start=last_sunday(date.today()), end=date.today())
     )

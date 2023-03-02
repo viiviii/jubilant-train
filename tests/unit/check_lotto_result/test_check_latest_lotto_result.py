@@ -3,7 +3,7 @@ from textwrap import dedent
 from typing import List
 
 from check_lotto_result.check_latest_lotto_result import last_sunday, check_latest_lotto_result, DateRange
-from lotto.lotto import Account
+from lotto.account import Account
 from lotto.lotto import Lotto
 from sends.send import Send, SendResult
 
@@ -18,7 +18,7 @@ def test_last_sunday():
 
 def test_check_latest_lotto_result():
     result = check_latest_lotto_result(
-        account=Account(account_id='stub-id', account_password='stub-password'),
+        account=Account(account_id='stub-id', password='stub-password'),
         lotto=StubLotto(),
         send=StubSend(),
         search_dates=DateRange(date(2023, 2, 12), date(2023, 2, 18))

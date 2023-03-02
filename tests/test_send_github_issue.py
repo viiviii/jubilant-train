@@ -4,6 +4,8 @@ from lotto.secret import Secret
 from sends.send import SendError
 from sends.send_github_issue import SendGithubIssue
 
+# todo: 어차피 짭으로 테스트하는데 이제 필요한가?
+
 _title = '🎊 로또6/45 1055회(23-02-18)'
 _content = (
     '💰 총 당첨금: 1,234,567원\n'

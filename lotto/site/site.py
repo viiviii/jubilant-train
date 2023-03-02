@@ -2,13 +2,13 @@ from typing import List
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from lotto.lotto import Account
+from lotto.account import Account
 from lotto.lotto import Lotto
-from lotto.lotto_site_page import LoginPage, LottoPage, MyBuyPage
+from lotto.site.pages import LoginPage, LottoPage, MyBuyPage
 from lotto.types import DateRange
 
 
-class LottoSite(Lotto):
+class Site(Lotto):
 
     def __init__(self, driver: WebDriver) -> None:
         self._driver = driver

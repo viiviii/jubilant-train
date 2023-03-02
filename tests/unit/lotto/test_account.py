@@ -1,4 +1,4 @@
-from lotto.lotto import Account
+from lotto.account import Account
 
 
 def test_masked_password_when_account_is_print():
