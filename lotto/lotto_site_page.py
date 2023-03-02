@@ -160,28 +160,13 @@ class MyBuyPage:
     def __init__(self, driver: WebDriver) -> None:
         self._driver = driver
 
-    def go(self) -> None:
-        self._driver.get(self.URL)
-
-        if self._has_failure():
-            raise LottoError(reason='당첨 조회 실패', detail=self._failure_message())
-
-    def search(self, dates: tuple[date, date]) -> Table:
+    def go(self, dates: tuple[date, date]) -> None:
         self._go_search(dates)
 
         if self._has_failure():
             raise LottoError(reason='당첨 조회 실패', detail=self._failure_message())
 
-        return self._history()
-
-    def _go_search(self, dates: tuple[date, date]) -> None:
-        # todo: page 여러 개인 경우? nowPage 부분 수정
-        start, end = [dt.strftime('%Y%m%d') for dt in dates]  # YYYYMMDD
-        search = f'&searchStartDate={start}&searchEndDate={end}&lottoId=LO40&nowPage=1'
-
-        self._driver.get(f'{self.URL}{search}')
-
-    def _history(self) -> Table:
+    def history(self) -> Table:
         table = self._driver.find_element(**self.By.HISTORY_TABLE)
         return Table.from_element(table)
 
@@ -203,6 +188,13 @@ class MyBuyPage:
             return 0
 
         return int(''.join(filter(str.isdigit, value)))
+
+    def _go_search(self, dates: tuple[date, date]) -> None:
+        # todo: page 여러 개인 경우? nowPage 부분 수정
+        start, end = [dt.strftime('%Y%m%d') for dt in dates]  # YYYYMMDD
+        query = f'&searchStartDate={start}&searchEndDate={end}&lottoId=LO40&nowPage=1'
+
+        self._driver.get(f'{self.URL}{query}')
 
     def _has_failure(self) -> bool:
         return bool(self._failure())

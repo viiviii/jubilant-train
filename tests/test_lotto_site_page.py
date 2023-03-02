@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -87,7 +89,7 @@ class TestMyBuyPageElements:
 
     @pytest.fixture(scope='class', autouse=True)
     def setup(self, login, page):
-        page.go()
+        page.go(dates=(date.today(), date.today()))
 
     def test_history_table(self, page, find_element):
         assert find_element(page.By.HISTORY_TABLE)

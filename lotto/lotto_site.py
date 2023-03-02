@@ -30,7 +30,7 @@ class LottoSite(Lotto):
     def result(self, start: date, end: date) -> dict[str, Any]:
         page = MyBuyPage(driver=self._driver)
 
-        page.go()
-        table = page.search(dates=(start, end))
+        page.go(dates=(start, end))
+        buys = page.history()
 
-        return {'조회 시작일': start, '조회 종료일': end} | page.total_buy_result(table.zip())
+        return {'조회 시작일': start, '조회 종료일': end} | page.total_buy_result(buys.zip())
