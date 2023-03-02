@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import date
 from itertools import zip_longest
 from typing import List, Optional
 
@@ -13,6 +12,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
 from lotto.lotto import Account, LottoError
+from lotto.types import DateRange
 
 
 class Selector(dict):
@@ -160,7 +160,7 @@ class MyBuyPage:
     def __init__(self, driver: WebDriver) -> None:
         self._driver = driver
 
-    def go(self, dates: tuple[date, date]) -> None:
+    def go(self, dates: DateRange) -> None:
         self._go_search(dates)
 
         if self._has_failure():
@@ -170,28 +170,9 @@ class MyBuyPage:
         table = self._driver.find_element(**self.By.HISTORY_TABLE)
         return Table.from_element(table)
 
-    # todo: 여기 맞냐
-    def total_buy_result(self, buys: List[dict[str, str]]) -> dict[str, int]:
-        amount = [self.extract_amount(lottery['당첨금']) for lottery in buys]
-        count = [int(lottery['구입매수'] or 0) for lottery in buys]
-        unpick = [int(lottery['구입매수'] or 0) for lottery in buys if lottery['당첨결과'] == '미추첨']
-
-        return {
-            '총 당첨금': sum(amount),
-            '총 구입매수': sum(count),
-            '미추첨': sum(unpick),
-        }
-
-    # todo: 여기 맞냐
-    def extract_amount(self, value: str) -> int:
-        if not value or value == '-':
-            return 0
-
-        return int(''.join(filter(str.isdigit, value)))
-
-    def _go_search(self, dates: tuple[date, date]) -> None:
+    def _go_search(self, dates: DateRange) -> None:
         # todo: page 여러 개인 경우? nowPage 부분 수정
-        start, end = [dt.strftime('%Y%m%d') for dt in dates]  # YYYYMMDD
+        start, end = [dt.strftime('%Y%m%d') for dt in dates]
         query = f'&searchStartDate={start}&searchEndDate={end}&lottoId=LO40&nowPage=1'
 
         self._driver.get(f'{self.URL}{query}')
@@ -203,9 +184,9 @@ class MyBuyPage:
         return self._failure().text
 
     def _failure(self) -> Optional[WebElement]:
-        """메세지 종류:
-            로그인 후 이용이 가능합니다.
-            조회 결과가 없습니다.
+        """
+        로그인 후 이용이 가능합니다.
+        조회 결과가 없습니다.
         """
         try:
             return self._driver.find_element(**self.By.FAILURE)

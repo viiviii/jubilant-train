@@ -1,11 +1,11 @@
-from datetime import date
-from typing import Any
+from typing import List
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from lotto.lotto import Account
 from lotto.lotto import Lotto
 from lotto.lotto_site_page import LoginPage, LottoPage, MyBuyPage
+from lotto.types import DateRange
 
 
 class LottoSite(Lotto):
@@ -27,10 +27,10 @@ class LottoSite(Lotto):
 
         return total_price
 
-    def result(self, start: date, end: date) -> dict[str, Any]:
+    def result(self, dates: DateRange) -> List[dict[str, str]]:
         page = MyBuyPage(driver=self._driver)
 
-        page.go(dates=(start, end))
+        page.go(dates)
         buys = page.history()
 
-        return {'조회 시작일': start, '조회 종료일': end} | page.total_buy_result(buys.zip())
+        return buys.zip()

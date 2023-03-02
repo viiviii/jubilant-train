@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from datetime import date
-from typing import Any
+from typing import List
+
+from lotto.types import DateRange
 
 
 class Account(object):
@@ -30,7 +31,7 @@ class Lotto(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def result(self, start: date, end: date) -> dict[str, Any]:
+    def result(self, dates: DateRange) -> List[dict[str, str]]:
         pass
 
 

@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 from selenium import webdriver
 
@@ -34,9 +36,9 @@ class TestSuccess:
         assert 결제_금액 == 구입_매수 * 로또_가격
 
     def test_result(self, lotto):
-        오늘 = date.today()
+        조회_기간은_오늘 = DateRange(date.today(), date.today())
 
-        구매_결과 = lotto.result(start=오늘, end=오늘)
+        구매_결과 = lotto.result(dates=조회_기간은_오늘)
 
         assert 구매_결과
 
@@ -45,7 +47,7 @@ class TestFailure:
 
     def test_result_failure_when_not_logged_in(self, lotto):
         with pytest.raises(LottoError, match='당첨 조회 실패'):
-            lotto.result(start=date.today(), end=date.today())
+            lotto.result(dates=DateRange(date.today(), date.today()))
 
     def test_buy_failure_when_not_logged_in(self, lotto):
         with pytest.raises(LottoError, match='로또 구매 실패'):
