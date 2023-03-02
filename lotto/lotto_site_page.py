@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import date
 from itertools import zip_longest
 from typing import List, Optional
@@ -21,6 +22,31 @@ class Selector(dict):
     def __init__(self, value: str, description: str) -> None:
         super().__init__(by=By.CSS_SELECTOR, value=value)
         self.description = description
+
+
+@dataclass(frozen=True)
+class Table:
+    headers: List[str]
+    rows: List[List[str]]
+
+    @staticmethod
+    def from_element(table: WebElement):
+        assert table.tag_name == 'table'
+        headers = table.find_elements(**Table.By.HEADERS)
+        rows = table.find_elements(**Table.By.ROWS)
+
+        return Table(
+            headers=[th.text for th in headers],
+            rows=[[td.text for td in row.find_elements(**Table.By.CELLS)] for row in rows]
+        )
+
+    def zip(self) -> List[dict[str, str]]:
+        return [dict(zip_longest(self.headers, cells, fillvalue='')) for cells in self.rows]
+
+    class By:
+        HEADERS = Selector(value='thead th', description='테이블 헤더')
+        ROWS = Selector(value='tbody tr', description='테이블 로우')
+        CELLS = Selector(value='td', description='테이블 셀')
 
 
 class LoginPage:
@@ -140,26 +166,24 @@ class MyBuyPage:
         if self._has_failure():
             raise LottoError(reason='당첨 조회 실패', detail=self._failure_message())
 
-    def search(self, dates: tuple[date, date]) -> List[dict[str, str]]:
-        # todo: page 여러 개인 경우? nowPage 부분 수정
-        start, end = [dt.strftime('%Y%m%d') for dt in dates]  # YYYYMMDD
-        self._driver.get(f'{self.URL}&searchStartDate={start}&searchEndDate={end}&lottoId=LO40&nowPage=1')
+    def search(self, dates: tuple[date, date]) -> Table:
+        self._go_search(dates)
 
         if self._has_failure():
             raise LottoError(reason='당첨 조회 실패', detail=self._failure_message())
 
-        return self._buy_results()
+        return self._history()
 
-    def _buy_results(self) -> List[dict[str, str]]:
-        headers = [th.text for th in self._driver.find_elements(**self.By.TABLE_HEADER)]
-        rows = self._driver.find_elements(**self.By.TABLE_ROW)
+    def _go_search(self, dates: tuple[date, date]) -> None:
+        # todo: page 여러 개인 경우? nowPage 부분 수정
+        start, end = [dt.strftime('%Y%m%d') for dt in dates]  # YYYYMMDD
+        search = f'&searchStartDate={start}&searchEndDate={end}&lottoId=LO40&nowPage=1'
 
-        buys = []
-        for row in rows:
-            tds = row.find_elements(By.TAG_NAME, 'td')
-            buys.append(dict(zip_longest(headers, [td.text for td in tds], fillvalue='')))
+        self._driver.get(f'{self.URL}{search}')
 
-        return buys
+    def _history(self) -> Table:
+        table = self._driver.find_element(**self.By.HISTORY_TABLE)
+        return Table.from_element(table)
 
     # todo: 여기 맞냐
     def total_buy_result(self, buys: List[dict[str, str]]) -> dict[str, int]:
@@ -197,6 +221,5 @@ class MyBuyPage:
             return None
 
     class By:
-        TABLE_HEADER = Selector(value='.tbl_data thead th', description='당첨 결과 테이블 헤더')
-        TABLE_ROW = Selector(value='.tbl_data tbody tr', description='당첨 결과 테이블 로우')
+        HISTORY_TABLE = Selector(value='.tbl_data', description='당첨 결과 테이블')
         FAILURE = Selector(value='.nodata', description='결과 없음 메세지')

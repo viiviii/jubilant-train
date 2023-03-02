@@ -31,6 +31,6 @@ class LottoSite(Lotto):
         page = MyBuyPage(driver=self._driver)
 
         page.go()
-        results = page.search(dates=(start, end))
+        table = page.search(dates=(start, end))
 
-        return {'조회 시작일': start, '조회 종료일': end} | page.total_buy_result(results)
+        return {'조회 시작일': start, '조회 종료일': end} | page.total_buy_result(table.zip())
