@@ -23,14 +23,12 @@ class Site(Lotto):
         page = LottoPage(driver=self._driver)
 
         page.go()
-        total_price = page.buy(amount)
 
-        return total_price
+        return page.buy(amount)
 
     def result(self, dates: DateRange) -> List[dict[str, str]]:
         page = MyBuyPage(driver=self._driver)
 
         page.go(dates)
-        buys = page.history()
 
-        return buys.zip()
+        return page.history()

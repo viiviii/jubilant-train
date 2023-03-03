@@ -1,57 +1,21 @@
-from dataclasses import dataclass
-from itertools import zip_longest
 from typing import Optional, List
 
-from selenium.common import NoSuchElementException, WebDriverException
+from selenium.common import WebDriverException, NoSuchElementException
 from selenium.webdriver.common.alert import Alert
-from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
-from lotto.account import Account
-from lotto.lotto import LottoError
+from lotto.lotto import Account, LottoError
+from lotto.site.elements import Table, LoginPageElements, LottoPageElements, MyBuyPageElements, zip_table
 from lotto.types import DateRange
-
-
-class Selector(dict):
-    value: str
-    description: str
-
-    def __init__(self, value: str, description: str) -> None:
-        super().__init__(by=By.CSS_SELECTOR, value=value)
-        self.description = description
-
-
-@dataclass(frozen=True)
-class Table:
-    headers: List[str]
-    rows: List[List[str]]
-
-    @staticmethod
-    def from_element(table: WebElement):
-        assert table.tag_name == 'table'
-        headers = table.find_elements(**Table.By.HEADERS)
-        rows = table.find_elements(**Table.By.ROWS)
-
-        return Table(
-            headers=[th.text for th in headers],
-            rows=[[td.text for td in row.find_elements(**Table.By.CELLS)] for row in rows]
-        )
-
-    def zip(self) -> List[dict[str, str]]:
-        return [dict(zip_longest(self.headers, cells, fillvalue='')) for cells in self.rows]
-
-    class By:
-        HEADERS = Selector(value='thead th', description='테이블 헤더')
-        ROWS = Selector(value='tbody tr', description='테이블 로우')
-        CELLS = Selector(value='td', description='테이블 셀')
 
 
 class LoginPage:
     URL = 'https://dhlottery.co.kr/user.do?method=login'
+    By = LoginPageElements
 
     def __init__(self, driver: WebDriver) -> None:
         self._driver = driver
@@ -90,13 +54,10 @@ class LoginPage:
         except WebDriverException:
             return None
 
-    class By:
-        ACCOUNT_INPUTS = Selector(value='#article .form input', description='계정 정보 입력 박스 목록')
-        LOGIN_BUTTON = Selector(value='#article .form a', description='로그인 버튼')
-
 
 class LottoPage:
     URL = 'https://ol.dhlottery.co.kr/olotto/game/game645.do'
+    By = LottoPageElements
 
     def __init__(self, driver: WebDriver) -> None:
         self._driver = driver
@@ -145,18 +106,10 @@ class LottoPage:
     def _failure(self) -> WebElement:
         return self._driver.find_element(**self.By.FAILURE)
 
-    class By:
-        AUTO_CHECKBOX = Selector(value='label[for="checkAutoSelect"]', description='자동선택 체크박스')
-        QUANTITY_SELECT = Selector(value='#amoundApply', description='적용수량 옵션 선택')
-        APPLY_BUTTON = Selector(value='#btnSelectNum', description='옵션 적용 버튼')
-        BUY_BUTTON = Selector(value='#btnBuy', description='구매하기 버튼')
-        BUY_CONFIRM_BUTTON = Selector(value='#popupLayerConfirm input[value="확인"]', description='구매 확정 버튼')
-        TOTAL_PRICE = Selector(value='#payAmt', description='결제 금액')  # todo: 최종 구매 레이어에서 가져오기
-        FAILURE = Selector(value='#popupLayerAlert', description='경고 팝업')
-
 
 class MyBuyPage:
     URL = 'https://dhlottery.co.kr/myPage.do?method=lottoBuyList'
+    By = MyBuyPageElements
 
     def __init__(self, driver: WebDriver) -> None:
         self._driver = driver
@@ -167,9 +120,9 @@ class MyBuyPage:
         if self._has_failure():
             raise LottoError(reason='당첨 조회 실패', detail=self._failure_message())
 
-    def history(self) -> Table:
-        table = self._driver.find_element(**self.By.HISTORY_TABLE)
-        return Table.from_element(table)
+    def history(self) -> List[dict[str, str]]:
+        table = Table(self._driver)
+        return zip_table(header=table.headers_to_texts(), rows=table.rows_to_texts())
 
     def _go_search(self, dates: DateRange) -> None:
         # todo: page 여러 개인 경우? nowPage 부분 수정
@@ -193,7 +146,3 @@ class MyBuyPage:
             return self._driver.find_element(**self.By.FAILURE)
         except NoSuchElementException:
             return None
-
-    class By:
-        HISTORY_TABLE = Selector(value='.tbl_data', description='당첨 결과 테이블')
-        FAILURE = Selector(value='.nodata', description='결과 없음 메세지')

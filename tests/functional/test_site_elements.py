@@ -1,7 +1,7 @@
 import pytest
-from selenium.webdriver.common.by import By
 
-from lotto.site.pages import LoginPage, LottoPage, MyBuyPage, Selector, Table
+from lotto.site.elements import Table
+from lotto.site.pages import LoginPage, LottoPage, MyBuyPage
 
 
 @pytest.fixture(scope='class')
@@ -87,15 +87,20 @@ class TestMyBuyPageElements:
     def page(self):
         return MyBuyPage
 
+    @pytest.fixture(scope='class')
+    def table(self, driver):
+        return Table(driver)
+
     @pytest.fixture(scope='class', autouse=True)
     def setup(self, login, load):
         pass
 
-    def test_history_table(self, by, find_element):
-        assert find_element(by.HISTORY_TABLE)
+    def test_table(self, table):
+        assert table.headers
+        assert table.rows
 
-    def test_history_table_headers(self, by, find_element):
-        headers = Table.from_element(find_element(by.HISTORY_TABLE)).headers
+    def test_table_header_values(self, table):
+        headers = table.headers_to_texts()
         assert '구입일자' in headers
         assert '복권명' in headers
         assert '회차' in headers
@@ -104,37 +109,3 @@ class TestMyBuyPageElements:
         assert '당첨결과' in headers
         assert '당첨금' in headers
         assert '추첨일' in headers
-
-
-def test_selector():
-    selector = Selector(value='#id .class', description='테스트 아이디')
-
-    assert selector == {'by': By.CSS_SELECTOR, 'value': '#id .class'}
-    assert selector.description == '테스트 아이디'
-
-
-def test_table_zip():
-    table = Table(headers=['이름', '나이'], rows=[['박덕배', '22'], ['장평수', '7']])
-
-    actual = table.zip()
-
-    assert len(actual) == 2
-    assert actual[0] == {'이름': '박덕배', '나이': '22'}
-    assert actual[1] == {'이름': '장평수', '나이': '7'}
-
-
-def test_table_zip_when_empty_rows():
-    table = Table(headers=['이름', '나이'], rows=[])
-
-    actual = table.zip()
-
-    assert actual == []
-
-
-def test_table_zip_when_nested_empty_rows():
-    table = Table(headers=['이름', '나이'], rows=[[]])
-
-    actual = table.zip()
-
-    assert len(actual) == 1
-    assert actual[0] == {'이름': '', '나이': ''}
