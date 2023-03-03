@@ -1,22 +1,8 @@
 from abc import ABCMeta, abstractmethod
-from datetime import date
-from typing import Any
+from typing import List
 
-
-class Account(object):
-    def __init__(self, account_id: str, account_password: str) -> None:
-        self.id = account_id
-        self.password = account_password
-
-    def __str__(self) -> str:
-        def mask(string) -> str:
-            return '*' * len(string)
-
-        return f'id={self.id}, ' \
-               f'password={mask(self.password) if self.password else self.password}'
-
-    def __repr__(self) -> str:
-        return f'Account({self})'
+from lotto.account import Account
+from lotto.types import DateRange
 
 
 class Lotto(metaclass=ABCMeta):
@@ -30,7 +16,7 @@ class Lotto(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def result(self, start: date, end: date) -> dict[str, Any]:
+    def result(self, dates: DateRange) -> List[dict[str, str]]:
         pass
 
 
