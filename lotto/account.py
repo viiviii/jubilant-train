@@ -3,18 +3,28 @@ from typing import Optional
 
 import keyring
 
+from lotto.secret import Secret
+
 
 class Account(object):
     def __init__(self, account_id: str, password: str) -> None:
-        self.id = account_id
-        self.password = password
+        self._id = account_id
+        self._secret = Secret(password)
+
+        if not account_id or not password:
+            raise ValueError('아이디와 비밀번호는 필수 값이다. '
+                             f'id={self.id}, password={self._secret}')
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def password(self):
+        return self._secret.value
 
     def __str__(self) -> str:
-        def mask(string) -> str:
-            return '*' * len(string)
-
-        return f'id={self.id}, ' \
-               f'password={mask(self.password) if self.password else self.password}'
+        return f'id={self._id}, password={self._secret}'
 
     def __repr__(self) -> str:
         return f'Account({self})'
@@ -24,8 +34,6 @@ ID_ARGUMENT_NAME = '--id'
 ID_ARGUMENT_OPTIONS = {'type': str, 'help': '로또 사이트 계정 아이디'}
 KEYRING_SERVICE_NAME = 'lotto-purchase-keyring'
 
-
-# todo: 파일명 바꿔라
 
 def fetch_account() -> Account:
     _id = _id_from_args()
