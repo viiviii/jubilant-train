@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 import requests
 
 from lotto.secret import Secret
@@ -6,9 +8,10 @@ from sends.send import Send, SendResult, SendError
 
 class SendGithubIssue(Send):
 
-    def __init__(self, token: Secret, repository: str) -> None:
+    def __init__(self, token: Secret, repository: str, labels: Optional[List[str]] = None) -> None:
         self.token = token
         self.repository = repository
+        self.labels = labels or []
 
     def __call__(self, title: str, content: str) -> SendResult:
         response = self._create_issue(title, content)
@@ -33,5 +36,6 @@ class SendGithubIssue(Send):
             json={
                 'title': title,
                 'body': content,
+                'labels': self.labels
             },
         )
