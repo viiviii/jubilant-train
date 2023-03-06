@@ -18,7 +18,7 @@ def test_last_sunday():
 
 def test_check_latest_lotto_result():
     result = check_latest_lotto_result(
-        account=Account(account_id='stub-id', password='stub-password'),
+        account=Account(id_='stub-id', password='stub-password'),
         lotto=StubLotto(),
         send=StubSend(),
         search_dates=DateRange(date(2023, 2, 12), date(2023, 2, 18))

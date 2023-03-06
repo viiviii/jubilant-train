@@ -2,17 +2,17 @@ from datetime import datetime, timezone
 
 import pytest
 
-from lotto.secret import Secret
+import sends.github
+from sends.auth import Auth
 from sends.send import SendError, Send
-from sends.send_github_issue import SendGithubIssue
 from tests.functional.conftest import close_testing_issues
 
 
 @pytest.fixture
-def send(token, repository, labels) -> Send:
-    _start = datetime.now(timezone.utc)
-    yield SendGithubIssue(token=token, repository=repository, labels=labels)
-    close_testing_issues(since=_start, token=token, repository=repository, labels=labels)
+def send(auth, labels) -> Send:
+    start = datetime.now(timezone.utc)
+    yield sends.github.Issue(auth=auth, labels=labels)
+    close_testing_issues(auth=auth, labels=labels, since=start)
 
 
 # noinspection NonAsciiCharacters
@@ -24,11 +24,10 @@ def test_success(send):
 
 
 # noinspection NonAsciiCharacters
-def test_failure():
-    유효하지_않은_토큰 = Secret('invalid-token')
-    권한이_없는_리포 = 'octocat/Hello-World'
+def test_failure(auth):
+    유효하지_않은_인증 = Auth(token='invalid-token', owner=auth.owner, repository=auth.repository)
 
-    send = SendGithubIssue(token=유효하지_않은_토큰, repository=권한이_없는_리포)
+    send = sends.github.Issue(auth=유효하지_않은_인증)
 
     with pytest.raises(SendError, match='이슈 생성 실패'):
         send(title='제목', content='내용')

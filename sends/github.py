@@ -2,15 +2,14 @@ from typing import Optional, List
 
 import requests
 
-from lotto.secret import Secret
+from sends.auth import Auth
 from sends.send import Send, SendResult, SendError
 
 
-class SendGithubIssue(Send):
+class Issue(Send):
 
-    def __init__(self, token: Secret, repository: str, labels: Optional[List[str]] = None) -> None:
-        self.token = token
-        self.repository = repository
+    def __init__(self, auth: Auth, labels: Optional[List[str]] = None) -> None:
+        self.auth = auth
         self.labels = labels or []
 
     def __call__(self, title: str, content: str) -> SendResult:
@@ -27,10 +26,10 @@ class SendGithubIssue(Send):
         https://docs.github.com/ko/rest/issues/issues?apiVersion=2022-11-28#create-an-issue
         """
         return requests.post(
-            f'https://api.github.com/repos/{self.repository}/issues',
+            f'https://api.github.com/repos/{self.auth.repository}/issues',
             headers={
                 'Accept': 'application/vnd.github+json',
-                'Authorization': f'Bearer {self.token.value}',
+                'Authorization': f'Bearer {self.auth.token}',
                 'X-GitHub-Api-Version': '2022-11-28',
             },
             json={

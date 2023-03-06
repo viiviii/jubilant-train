@@ -5,8 +5,9 @@ import requests
 from _pytest.config.argparsing import Parser
 from selenium import webdriver
 
-from lotto.account import Account, fetch_account, ID_ARGUMENT_OPTIONS, ID_ARGUMENT_NAME
-from lotto.secret import Secret
+import lotto.account
+import sends.auth
+from lotto.account import ID_ARGUMENT_OPTIONS, ID_ARGUMENT_NAME
 
 
 @pytest.fixture(scope='class')
@@ -17,8 +18,13 @@ def driver():
 
 
 @pytest.fixture(scope='session')
-def account() -> Account:
-    return fetch_account()
+def account() -> lotto.account.Account:
+    return lotto.account.from_env()
+
+
+@pytest.fixture(scope='session')
+def auth() -> sends.auth.Auth:
+    return sends.auth.from_env()
 
 
 def pytest_addoption(parser):
@@ -30,40 +36,28 @@ def _add_id_option_for_passing_argument_to_pytest(parser: Parser):
 
 
 @pytest.fixture(scope='session')
-def token():
-    # todo: env에서 가져오기
-    return Secret('token')
-
-
-@pytest.fixture(scope='session')
-def repository():
-    # todo: env에서 가져오기
-    return 'viiviii/something'
-
-
-@pytest.fixture(scope='session')
 def labels():
     return ['for-testing']
 
 
-def close_testing_issues(token, repository, labels, since):
-    issues = issues_created_by_tests(token=token, repository=repository, labels=labels, since=since)
+def close_testing_issues(auth, labels, since):
+    issues = issues_created_by_tests(auth=auth, labels=labels, since=since)
 
     for issue in issues:
-        close_issue(token=token, repository=repository, number=issue['number'])
+        close_issue(auth=auth, number=issue['number'])
 
 
-def issues_created_by_tests(token, repository, labels, since: datetime = date.today()):
+def issues_created_by_tests(auth, labels, since: datetime = date.today()):
     response = requests.get(
-        f'https://api.github.com/repos/{repository}/issues',
+        f'https://api.github.com/repos/{auth.repository}/issues',
         headers={
             'Accept': 'application/vnd.github+json',
-            'Authorization': f'Bearer {token.value}',
+            'Authorization': f'Bearer {auth.token}',
             'X-GitHub-Api-Version': '2022-11-28',
         },
         params={
             'state': 'open',
-            'creator': repository.split('/')[0],
+            'creator': auth.owner,
             'labels': labels,
             'since': since.isoformat()
         },
@@ -74,12 +68,12 @@ def issues_created_by_tests(token, repository, labels, since: datetime = date.to
     return response.json()
 
 
-def close_issue(token, repository, number):
+def close_issue(auth, number):
     response = requests.patch(
-        f'https://api.github.com/repos/{repository}/issues/{number}',
+        f'https://api.github.com/repos/{auth.repository}/issues/{number}',
         headers={
             'Accept': 'application/vnd.github+json',
-            'Authorization': f'Bearer {token.value}',
+            'Authorization': f'Bearer {auth.token}',
             'X-GitHub-Api-Version': '2022-11-28',
         },
         json={

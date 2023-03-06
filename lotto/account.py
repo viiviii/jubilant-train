@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser
 from typing import Optional
 
@@ -6,14 +7,13 @@ import keyring
 from lotto.secret import Secret
 
 
-class Account(object):
-    def __init__(self, account_id: str, password: str) -> None:
-        self._id = account_id
+class Account:
+    def __init__(self, id_: str, password: str) -> None:
+        self._id = id_
         self._secret = Secret(password)
 
-        if not account_id or not password:
-            raise ValueError('아이디와 비밀번호는 필수 값이다. '
-                             f'id={self.id}, password={self._secret}')
+        if not id_ or not password:
+            raise ValueError(f'계정 정보는 필수 값 입니다. {self.__repr__()}')
 
     @property
     def id(self):
@@ -28,6 +28,13 @@ class Account(object):
 
     def __repr__(self) -> str:
         return f'Account({self})'
+
+
+def from_env() -> Account:
+    return Account(
+        id_=os.environ['LOTTERY_ACCOUNT_ID'],
+        password=os.environ['LOTTERY_ACCOUNT_PASSWORD']
+    )
 
 
 ID_ARGUMENT_NAME = '--id'
