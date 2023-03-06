@@ -2,17 +2,10 @@ from datetime import date, datetime
 
 import pytest
 import requests
-from selenium import webdriver
 
 import lotto.account
 import sends.auth
-
-
-@pytest.fixture(scope='class')
-def driver():
-    _driver = webdriver.Chrome()
-    yield _driver
-    _driver.quit()
+from lotto.site import drivers
 
 
 @pytest.fixture(scope='session')
@@ -28,6 +21,13 @@ def auth() -> sends.auth.Auth:
 @pytest.fixture(scope='session')
 def labels():
     return ['for-testing']
+
+
+@pytest.fixture(scope='class')
+def driver():
+    _driver = drivers.headless_chrome()
+    yield _driver
+    _driver.quit()
 
 
 def close_testing_issues(auth, labels, since):
