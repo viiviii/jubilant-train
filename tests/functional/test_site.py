@@ -11,14 +11,13 @@ def lotto(driver) -> Lotto:
     return Site(driver)
 
 
-# todo: 이거 진짜 돌릴거면 마커 달아놔라
 # noinspection NonAsciiCharacters
 class TestSuccess:
 
-    @pytest.fixture(scope='class', autouse=True)
-    def setup(self, lotto, account):
+    def test_login(self, lotto, account):
         lotto.login(account)
 
+    @pytest.mark.buy_required
     def test_buy(self, lotto):
         구입_매수 = 1
         로또_가격 = 1_000
@@ -27,6 +26,7 @@ class TestSuccess:
 
         assert 결제_금액 == 구입_매수 * 로또_가격
 
+    @pytest.mark.buy_required
     def test_result(self, lotto):
         조회_기간은_오늘 = DateRange(date.today(), date.today())
 
