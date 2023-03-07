@@ -1,18 +1,15 @@
-from datetime import datetime, timezone
-
 import pytest
 
 import sends.github
 from sends.auth import Auth
 from sends.send import SendError, Send
-from tests.functional.conftest import close_testing_issues
+from tests.functional.conftest import close_issues_by_labels
 
 
 @pytest.fixture
 def send(auth, labels) -> Send:
-    start = datetime.now(timezone.utc)
     yield sends.github.Issue(auth=auth, labels=labels)
-    close_testing_issues(auth=auth, labels=labels, since=start)
+    close_issues_by_labels(auth=auth, labels=labels)
 
 
 # noinspection NonAsciiCharacters
