@@ -1,11 +1,11 @@
-from datetime import date, datetime
+import uuid
 
 import pytest
-import requests
 
 import lotto.account
 import sends.auth
 from lotto.site import drivers
+from tests.helper import github_api as api
 
 
 @pytest.fixture(scope='session')
@@ -30,46 +30,16 @@ def driver():
     _driver.quit()
 
 
-def close_testing_issues(auth, labels, since):
-    issues = issues_created_by_tests(auth=auth, labels=labels, since=since)
+@pytest.fixture
+def labels(auth):
+    name = f'testing:{uuid.uuid4()}'
+    api.create_label(auth=auth, name=name, description='Unique labels for testing')
+    yield [name]
+    api.delete_label(auth=auth, name=name)
+
+
+def close_issues_by_labels(auth, labels):
+    issues = api.issues_by_labels(auth=auth, labels=labels)
 
     for issue in issues:
-        close_issue(auth=auth, number=issue['number'])
-
-
-def issues_created_by_tests(auth, labels, since: datetime = date.today()):
-    response = requests.get(
-        f'https://api.github.com/repos/{auth.repository}/issues',
-        headers={
-            'Accept': 'application/vnd.github+json',
-            'Authorization': f'Bearer {auth.token}',
-            'X-GitHub-Api-Version': '2022-11-28',
-        },
-        params={
-            'state': 'open',
-            'creator': auth.owner,
-            'labels': labels,
-            'since': since.isoformat()
-        },
-    )
-
-    assert response.ok, f'이슈 조회 실패=[{response.reason}] {response.text}'
-
-    return response.json()
-
-
-def close_issue(auth, number):
-    response = requests.patch(
-        f'https://api.github.com/repos/{auth.repository}/issues/{number}',
-        headers={
-            'Accept': 'application/vnd.github+json',
-            'Authorization': f'Bearer {auth.token}',
-            'X-GitHub-Api-Version': '2022-11-28',
-        },
-        json={
-            'state': 'closed',
-            'state_reason': 'completed',
-        }
-    )
-
-    assert response.ok, f'이슈 종료 실패=[{response.reason}] {response.text}'
+        api.close_issue(auth=auth, number=issue['number'])
