@@ -6,9 +6,6 @@ class Account:
         self._id = id_
         self._secret = Secret(password)
 
-        if not id_ or not password:
-            raise ValueError(f'계정 정보는 필수 값 입니다. {self.__repr__()}')
-
     @property
     def id(self):
         return self._id

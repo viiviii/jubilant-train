@@ -19,9 +19,6 @@ class Auth:
         self._owner = owner
         self._repository = repository
 
-        if not token or not owner or not repository:
-            raise ValueError(f'인증 정보는 필수 값 입니다. {self.__repr__()}')
-
     @property
     def token(self):
         return self._token.value
