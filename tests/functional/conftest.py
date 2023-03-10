@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 
+import env
 import lotto.account
 import sends.auth
 from lotto.site import drivers
@@ -10,12 +11,12 @@ from tests.helper import github_api as api
 
 @pytest.fixture(scope='session')
 def account() -> lotto.account.Account:
-    return lotto.account.from_env()
+    return env.ACCOUNT
 
 
 @pytest.fixture(scope='session')
 def auth() -> sends.auth.Auth:
-    return sends.auth.from_env()
+    return env.AUTH
 
 
 @pytest.fixture(scope='session')
@@ -40,6 +41,5 @@ def labels(auth):
 
 def close_issues_by_labels(auth, labels):
     issues = api.issues_by_labels(auth=auth, labels=labels)
-
     for issue in issues:
         api.close_issue(auth=auth, number=issue['number'])

@@ -1,5 +1,3 @@
-import os
-
 from lotto.secret import Secret
 
 
@@ -21,9 +19,6 @@ class Auth:
         self._owner = owner
         self._repository = repository
 
-        if not token or not owner or not repository:
-            raise ValueError(f'인증 정보는 필수 값 입니다. {self.__repr__()}')
-
     @property
     def token(self):
         return self._token.value
@@ -41,11 +36,3 @@ class Auth:
 
     def __repr__(self) -> str:
         return f'Auth({self})'
-
-
-def from_env() -> Auth:
-    return Auth(
-        token=os.environ['SEND_GITHUB_TOKEN'],
-        owner=os.environ['SEND_GITHUB_OWNER'],
-        repository=os.environ['SEND_GITHUB_REPOSITORY']
-    )
