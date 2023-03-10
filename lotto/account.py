@@ -1,5 +1,3 @@
-import os
-
 from lotto.secret import Secret
 
 
@@ -24,10 +22,3 @@ class Account:
 
     def __repr__(self) -> str:
         return f'Account({self})'
-
-
-def from_env() -> Account:
-    return Account(
-        id_=os.environ['LOTTERY_ACCOUNT_ID'],
-        password=os.environ['LOTTERY_ACCOUNT_PASSWORD']
-    )

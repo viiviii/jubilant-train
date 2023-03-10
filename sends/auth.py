@@ -1,5 +1,3 @@
-import os
-
 from lotto.secret import Secret
 
 
@@ -41,11 +39,3 @@ class Auth:
 
     def __repr__(self) -> str:
         return f'Auth({self})'
-
-
-def from_env() -> Auth:
-    return Auth(
-        token=os.environ['SEND_GITHUB_TOKEN'],
-        owner=os.environ['SEND_GITHUB_OWNER'],
-        repository=os.environ['SEND_GITHUB_REPOSITORY']
-    )
