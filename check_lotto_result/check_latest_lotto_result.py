@@ -32,6 +32,6 @@ if __name__ == '__main__':
     check_latest_lotto_result(
         account=env.ACCOUNT,
         lotto=Site(driver=headless_chrome()),
-        send=SendGithubIssue(auth=env.AUTH),
+        send=SendGithubIssue(github=env.GITHUB),
         search_dates=DateRange(start=last_sunday(date.today()), end=date.today())
     )

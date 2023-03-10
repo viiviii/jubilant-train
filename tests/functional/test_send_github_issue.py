@@ -1,15 +1,15 @@
 import pytest
 
 import sends.github
-from sends.auth import Auth
+from sends.github import Github
 from sends.send import SendError, Send
 from tests.functional.conftest import close_issues_by_labels
 
 
 @pytest.fixture
-def send(auth, labels) -> Send:
-    yield sends.github.Issue(auth=auth, labels=labels)
-    close_issues_by_labels(auth=auth, labels=labels)
+def send(github, labels) -> Send:
+    yield sends.github.Issue(github=github, labels=labels)
+    close_issues_by_labels(github=github, labels=labels)
 
 
 # noinspection NonAsciiCharacters
@@ -21,10 +21,10 @@ def test_success(send):
 
 
 # noinspection NonAsciiCharacters
-def test_failure(auth):
-    유효하지_않은_인증 = Auth(token='invalid-token', owner=auth.owner, repository=auth.repository)
+def test_failure(github):
+    유효하지_않은_토큰 = 'invalid-token'
 
-    send = sends.github.Issue(auth=유효하지_않은_인증)
+    send = sends.github.Issue(Github(token=유효하지_않은_토큰, repository=github.repository))
 
     with pytest.raises(SendError, match='이슈 생성 실패'):
         send(title='제목', content='내용')
