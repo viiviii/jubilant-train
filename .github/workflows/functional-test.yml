@@ -31,7 +31,6 @@ jobs:
         env:
           # Github 기본 환경 변수
           SEND_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SEND_GITHUB_OWNER: ${{ github.repository_owner }}
           SEND_GITHUB_REPOSITORY: ${{ github.repository }}
           # 설정이 필요한 환경 변수
           LOTTERY_ACCOUNT_ID: ${{ secrets.LOTTERY_ACCOUNT_ID }}

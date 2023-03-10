@@ -1,18 +1,18 @@
 import requests
 
 
-def _headers(auth):
+def _headers(token):
     return {
         'Accept': 'application/vnd.github+json',
-        'Authorization': f'Bearer {auth.token}',
+        'Authorization': f'Bearer {token}',
         'X-GitHub-Api-Version': '2022-11-28',
     }
 
 
-def issues_by_labels(auth, labels):
+def issues_by_labels(github, labels):
     response = requests.get(
-        f'https://api.github.com/repos/{auth.repository}/issues',
-        headers=_headers(auth),
+        f'https://api.github.com/repos/{github.repository}/issues',
+        headers=_headers(github.token),
         params={
             'state': 'open',
             'labels': labels,
@@ -24,10 +24,10 @@ def issues_by_labels(auth, labels):
     return response.json()
 
 
-def close_issue(auth, number):
+def close_issue(github, number):
     response = requests.patch(
-        f'https://api.github.com/repos/{auth.repository}/issues/{number}',
-        headers=_headers(auth),
+        f'https://api.github.com/repos/{github.repository}/issues/{number}',
+        headers=_headers(github.token),
         json={
             'state': 'closed',
             'state_reason': 'completed',
@@ -37,10 +37,10 @@ def close_issue(auth, number):
     assert response.ok, f'이슈 종료 실패=[{response.reason}] {response.text}'
 
 
-def create_label(auth, name, description):
+def create_label(github, name, description):
     response = requests.post(
-        f'https://api.github.com/repos/{auth.repository}/labels',
-        headers=_headers(auth),
+        f'https://api.github.com/repos/{github.repository}/labels',
+        headers=_headers(github.token),
         json={
             'name': name,
             'description': description,
@@ -51,10 +51,10 @@ def create_label(auth, name, description):
     assert response.ok, f'라벨 생성 실패=[{response.reason}] {response.text}'
 
 
-def delete_label(auth, name):
+def delete_label(github, name):
     response = requests.delete(
-        f'https://api.github.com/repos/{auth.repository}/labels/{name}',
-        headers=_headers(auth),
+        f'https://api.github.com/repos/{github.repository}/labels/{name}',
+        headers=_headers(github.token),
     )
 
     assert response.ok, f'라벨 삭제 실패=[{response.reason}] {response.text}'

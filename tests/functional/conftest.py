@@ -4,7 +4,7 @@ import pytest
 
 import env
 import lotto.account
-import sends.auth
+import sends.github
 from lotto.site import drivers
 from tests.helper import github_api as api
 
@@ -15,8 +15,8 @@ def account() -> lotto.account.Account:
 
 
 @pytest.fixture(scope='session')
-def auth() -> sends.auth.Auth:
-    return env.AUTH
+def github() -> sends.github.Github:
+    return env.GITHUB
 
 
 @pytest.fixture(scope='session')
@@ -32,14 +32,14 @@ def driver():
 
 
 @pytest.fixture
-def labels(auth):
-    name = f'testing:{uuid.uuid4()}'
-    api.create_label(auth=auth, name=name, description='Unique labels for testing')
-    yield [name]
-    api.delete_label(auth=auth, name=name)
+def labels(github):
+    label_name = f'testing:{uuid.uuid4()}'
+    api.create_label(github=github, name=label_name, description='Unique labels for testing')
+    yield [label_name]
+    api.delete_label(github=github, name=label_name)
 
 
-def close_issues_by_labels(auth, labels):
-    issues = api.issues_by_labels(auth=auth, labels=labels)
+def close_issues_by_labels(github, labels):
+    issues = api.issues_by_labels(github=github, labels=labels)
     for issue in issues:
-        api.close_issue(auth=auth, number=issue['number'])
+        api.close_issue(github=github, number=issue['number'])
