@@ -2,10 +2,10 @@ from datetime import date
 from textwrap import dedent
 from typing import List
 
-from check_lotto_result.check_latest_lotto_result import last_sunday, check_latest_lotto_result, DateRange
+from check_lotto_result.check_latest_lotto_result import last_sunday, \
+    check_latest_lotto_result, DateRange
 from lotto.account import Account
 from lotto.lotto import Lotto
-from sends.send import Send, SendResult
 
 
 def test_last_sunday():
@@ -17,15 +17,14 @@ def test_last_sunday():
 
 
 def test_check_latest_lotto_result():
-    result = check_latest_lotto_result(
+    title, content = check_latest_lotto_result(
         account=Account(id_='stub-id', password='stub-password'),
         lotto=StubLotto(),
-        send=StubSend(),
         search_dates=DateRange(date(2023, 2, 12), date(2023, 2, 18))
     )
 
-    assert result.title == '🎊 로또6/45 결과 (2023-02-12~2023-02-18)'
-    assert result.content == dedent('''
+    assert title == '🎊 로또6/45 결과 (2023-02-12~2023-02-18)'
+    assert content == dedent('''
         ### 1054회(2023-02-18)
         ```
         💰 당첨 금액: 0원
@@ -48,8 +47,3 @@ class StubLotto(Lotto):
         return [{'구입일자': '2023-02-13', '복권명': '로또6/45', '회차': '1054',
                  '선택번호/복권번호': '51738 11491 27411 72232 76893 71219',
                  '구입매수': '1', '당첨결과': '미추첨', '당첨금': '-', '추첨일': '2023-02-18'}]
-
-
-class StubSend(Send):
-    def __call__(self, title: str, content: str) -> SendResult:
-        return SendResult(title=title, content=content)

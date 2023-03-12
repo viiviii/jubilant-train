@@ -20,8 +20,8 @@ jobs:
       - name: Run tests
         env:
           # Github 기본 환경 변수
-          SEND_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SEND_GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_TOKEN: ${{ github.token }}
+          ISSUE_REPOSITORY: ${{ github.repository }}
           # 설정이 필요한 환경 변수
           LOTTERY_ACCOUNT_ID: ${{ secrets.LOTTERY_ACCOUNT_ID }}
           LOTTERY_ACCOUNT_PASSWORD: ${{ secrets.LOTTERY_ACCOUNT_PASSWORD }}
