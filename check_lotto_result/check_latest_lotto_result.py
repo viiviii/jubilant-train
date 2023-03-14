@@ -8,8 +8,6 @@ from lotto.lotto import Lotto
 from lotto.site.drivers import headless_chrome
 from lotto.site.site import Site
 from lotto.types import DateRange
-from sends.github import Issue as SendGithubIssue
-from sends.send import Send, SendResult
 
 
 def last_sunday(today: date) -> date:
@@ -20,18 +18,17 @@ def last_sunday(today: date) -> date:
     return today - timedelta(days=pass_days)
 
 
-def check_latest_lotto_result(account: Account, lotto: Lotto, send: Send, search_dates: DateRange) -> SendResult:
+def check_latest_lotto_result(account: Account, lotto: Lotto,
+                              search_dates: DateRange):
     lotto.login(account)
     buys = lotto.result(search_dates)
-
-    return send(title=message.title(search_dates),
-                content=message.content(group_by_round(buys)))
+    return message.title(search_dates), message.content(group_by_round(buys))
 
 
 if __name__ == '__main__':
     check_latest_lotto_result(
         account=env.ACCOUNT,
         lotto=Site(driver=headless_chrome()),
-        send=SendGithubIssue(github=env.GITHUB),
-        search_dates=DateRange(start=last_sunday(date.today()), end=date.today())
+        search_dates=DateRange(start=last_sunday(date.today()),
+                               end=date.today())
     )
