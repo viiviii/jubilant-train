@@ -1,25 +1,11 @@
 import os
 
-from lotto.secret import Secret
+import env
 from sends.github.issue import Issue, create
 
 
-class Inputs:
-    TOKEN = 'ISSUE_TOKEN'
-    REPOSITORY = 'ISSUE_REPOSITORY'
-    TITLE = 'ISSUE_TITLE'
-    CONTENT = 'ISSUE_CONTENT'
-    LABEL = 'ISSUE_LABEL'
-
-    @staticmethod
-    def to_issue():
-        return Issue(
-            token=Secret(os.environ[Inputs.TOKEN]),
-            repository=os.environ[Inputs.REPOSITORY],
-            title=os.environ[Inputs.TITLE],
-            content=os.environ[Inputs.CONTENT],
-            label=os.getenv(Inputs.LABEL),
-        )
+def inputs() -> Issue:
+    return env.to_issue()
 
 
 def outputs(response: dict[str, str]) -> None:
@@ -33,4 +19,4 @@ def send(issue: Issue) -> None:
 
 
 if __name__ == '__main__':
-    send(Inputs.to_issue())
+    send(inputs())
