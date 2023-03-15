@@ -1,8 +1,8 @@
 from textwrap import dedent
 from typing import List
 
-from check_lotto_result.summary import Summary
 from lotto.types import DateRange
+from result.summary import Summary
 
 
 def title(search_dates: DateRange):

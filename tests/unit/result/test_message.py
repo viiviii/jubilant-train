@@ -1,9 +1,9 @@
 from datetime import date
 from textwrap import dedent
 
-from check_lotto_result.message import title, content
-from check_lotto_result.summary import Summary
 from lotto.types import DateRange
+from result.message import title, content
+from result.summary import Summary
 
 
 def test_title():
