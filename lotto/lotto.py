@@ -1,8 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from typing import List
 
 from lotto.account import Account
-from lotto.types import DateRange
+from lotto.types import DateRange, Table
 
 
 class Lotto(metaclass=ABCMeta):
@@ -16,7 +15,7 @@ class Lotto(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def result(self, dates: DateRange) -> List[dict[str, str]]:
+    def result(self, dates: DateRange) -> Table:
         pass
 
 

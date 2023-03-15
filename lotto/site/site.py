@@ -1,11 +1,9 @@
-from typing import List
-
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.site.pages import LoginPage, LottoPage, MyBuyPage
-from lotto.types import DateRange
+from lotto.types import DateRange, Table
 
 
 class Site(Lotto):
@@ -26,7 +24,7 @@ class Site(Lotto):
 
         return page.buy(amount)
 
-    def result(self, dates: DateRange) -> List[dict[str, str]]:
+    def result(self, dates: DateRange) -> Table:
         page = MyBuyPage(driver=self._driver)
 
         page.go(dates)

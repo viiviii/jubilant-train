@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 
 from lotto.lotto import *
+from lotto.secret import Secret
 from lotto.site.site import Site
 
 
@@ -47,4 +48,4 @@ class TestFailure:
 
     def test_login_failure_when_invalid_account(self, lotto):
         with pytest.raises(LottoError, match='로그인 실패'):
-            lotto.login(Account('잘못된_아이디', '잘못된_비밀번호'))
+            lotto.login(Account('잘못된_아이디', Secret('잘못된_비밀번호')))

@@ -1,22 +1,21 @@
-import os
-
 import pytest
 import requests
 
+import env
 from lotto.secret import Secret
-from sends.github.issue import Issue, create
-from sends.github.main import Inputs
+from sends.github.issue import create
 
 
-@pytest.fixture(scope='class')
-def issue(label):
-    return Issue(
-        token=Secret(os.environ[Inputs.TOKEN]),
-        repository=os.environ[Inputs.REPOSITORY],
-        title='이슈 생성 테스트 제목', content='이슈 생성 테스트 본문', label=label)
+@pytest.fixture
+def issue(monkeypatch, label):
+    monkeypatch.setenv(env.ISSUE_TITLE, '이슈 생성 테스트 제목')
+    monkeypatch.setenv(env.ISSUE_CONTENT, '이슈 생성 테스트 내용')
+    if label:
+        monkeypatch.setenv(env.ISSUE_LABEL, label)
+    return env.to_issue()
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture
 def created_issue(issue):
     response = create(issue)
     yield response
