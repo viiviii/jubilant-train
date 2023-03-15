@@ -6,7 +6,7 @@ import pytest
 from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.secret import Secret
-from lotto.types import DateRange
+from lotto.types import DateRange, Table
 from result.main import outputs, result, inputs
 from result.summary import Summary
 
@@ -74,13 +74,14 @@ def test_result(github_output_contains):
     # given
     mock_lotto = mock.MagicMock(spec=Lotto)
     mock_lotto.login.return_value = None
-    mock_lotto.result.return_value = [
-        {
-            '구입일자': '2023-01-01', '복권명': '로또6/45', '회차': '3',
-            '선택번호/복권번호': '51738 11491 27411 72232 76893 71219',
-            '구입매수': '1', '당첨결과': '미추첨', '당첨금': '-', '추첨일': '2023-01-05'
-        }
-    ]
+    mock_lotto.result.return_value = Table(
+        headers=['구입일자', '복권명', '회차', '선택번호/복권번호',
+                 '구입매수', '당첨결과', '당첨금', '추첨일'],
+        rows=[[
+            '2023-01-01', '로또6/45', '3', '51738 11491 27411 72232 76893 71219',
+            '1', '미추첨', '-', '2023-01-05'
+        ]]
+    )
 
     account = Account('fake-user-id', Secret('abcde!2@4%'))
     search_dates = DateRange(date(2022, 12, 31), date(2023, 1, 1))

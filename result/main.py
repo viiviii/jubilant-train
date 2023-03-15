@@ -27,7 +27,7 @@ def result(lotto: Lotto, account: Account, search_dates: DateRange):
     buys = lotto.result(search_dates)
     outputs(
         search_dates=search_dates,
-        summaries=group_by_round(buys),
+        summaries=group_by_round(buys.zip()),
     )
 
 

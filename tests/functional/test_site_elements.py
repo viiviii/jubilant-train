@@ -1,6 +1,6 @@
 import pytest
 
-from lotto.site.elements import Table
+from lotto.site.elements import TableElement
 from lotto.site.pages import LoginPage, LottoPage, MyBuyPage
 
 
@@ -89,7 +89,7 @@ class TestMyBuyPageElements:
 
     @pytest.fixture(scope='class')
     def table(self, driver):
-        return Table(driver)
+        return TableElement(driver)
 
     @pytest.fixture(scope='class', autouse=True)
     def setup(self, login, load):

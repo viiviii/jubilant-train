@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 
 from selenium.common import WebDriverException, NoSuchElementException
 from selenium.webdriver.common.alert import Alert
@@ -9,9 +9,10 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
 from lotto.lotto import Account, LottoError
-from lotto.site.elements import Table, LoginPageElements, LottoPageElements, \
-    MyBuyPageElements, zip_table
-from lotto.types import DateRange
+from lotto.site.elements import TableElement, LoginPageElements, \
+    LottoPageElements, \
+    MyBuyPageElements
+from lotto.types import DateRange, Table
 
 
 class LoginPage:
@@ -122,10 +123,10 @@ class MyBuyPage:
         if self._has_failure():
             raise LottoError(reason='당첨 조회 실패', detail=self._failure_message())
 
-    def history(self) -> List[dict[str, str]]:
-        table = Table(self._driver)
-        return zip_table(header=table.headers_to_texts(),
-                         rows=table.rows_to_texts())
+    def history(self) -> Table:
+        table = TableElement(self._driver)
+        return Table(headers=table.headers_to_texts(),
+                     rows=table.rows_to_texts())
 
     def _go_search(self, dates: DateRange) -> None:
         # todo: page 여러 개인 경우? nowPage 부분 수정
