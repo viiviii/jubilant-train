@@ -5,6 +5,7 @@ import pytest
 
 from lotto.account import Account
 from lotto.lotto import Lotto
+from lotto.secret import Secret
 from lotto.types import DateRange
 from result.main import outputs, result, inputs
 from result.summary import Summary
@@ -35,7 +36,7 @@ def test_all_inputs(monkeypatch):
     account, search_dates = inputs()
 
     assert account.id == '복권 계정 아이디'
-    assert account.password == '복권 계정 비밀번호'  # todo
+    assert account.password == '복권 계정 비밀번호'
     assert search_dates.start == date(2022, 12, 31)
     assert search_dates.end == date(2023, 1, 1)
 
@@ -79,7 +80,7 @@ def test_result(github_output_contains):
         }
     ]
 
-    account = Account('fake-user-id', 'abcde!2@4%')
+    account = Account('fake-user-id', Secret('abcde!2@4%'))
     search_dates = DateRange(date(2022, 12, 31), date(2023, 1, 1))
 
     # when

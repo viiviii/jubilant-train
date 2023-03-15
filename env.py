@@ -13,8 +13,8 @@ LOTTERY_ACCOUNT_PASSWORD = 'LOTTERY_ACCOUNT_PASSWORD'
 
 def to_account() -> Account:
     return Account(
-        id_=_required(LOTTERY_ACCOUNT_ID),
-        password=_required(LOTTERY_ACCOUNT_PASSWORD),
+        id=_required(LOTTERY_ACCOUNT_ID),
+        password=Secret(_required(LOTTERY_ACCOUNT_PASSWORD)),
     )
 
 

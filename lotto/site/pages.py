@@ -9,7 +9,8 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
 from lotto.lotto import Account, LottoError
-from lotto.site.elements import Table, LoginPageElements, LottoPageElements, MyBuyPageElements, zip_table
+from lotto.site.elements import Table, LoginPageElements, LottoPageElements, \
+    MyBuyPageElements, zip_table
 from lotto.types import DateRange
 
 
@@ -31,7 +32,7 @@ class LoginPage:
         _id, password = self._driver.find_elements(**self.By.ACCOUNT_INPUTS)
 
         _id.send_keys(account.id)
-        password.send_keys(account.password)
+        password.send_keys(account.password.value)
 
     def _submit(self) -> None:
         login = self._driver.find_element(**self.By.LOGIN_BUTTON)
@@ -49,7 +50,8 @@ class LoginPage:
 
     def _failure(self) -> Optional[Alert]:
         try:
-            WebDriverWait(self._driver, 5).until(expected_conditions.alert_is_present())
+            WebDriverWait(self._driver, 5).until(
+                expected_conditions.alert_is_present())
             return self._driver.switch_to.alert
         except WebDriverException:
             return None
@@ -122,7 +124,8 @@ class MyBuyPage:
 
     def history(self) -> List[dict[str, str]]:
         table = Table(self._driver)
-        return zip_table(header=table.headers_to_texts(), rows=table.rows_to_texts())
+        return zip_table(header=table.headers_to_texts(),
+                         rows=table.rows_to_texts())
 
     def _go_search(self, dates: DateRange) -> None:
         # todo: page 여러 개인 경우? nowPage 부분 수정
