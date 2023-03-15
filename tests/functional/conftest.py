@@ -10,7 +10,7 @@ load_dotenv()
 
 @pytest.fixture(scope='session')
 def account() -> lotto.account.Account:
-    return env.ACCOUNT
+    return env.to_account()
 
 
 @pytest.fixture(scope='class')

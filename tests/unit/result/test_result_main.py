@@ -6,7 +6,7 @@ import pytest
 from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.types import DateRange
-from result.main import Inputs, outputs, result
+from result.main import outputs, result, inputs
 from result.summary import Summary
 
 
@@ -26,31 +26,28 @@ def github_output_contains(github_output):
     return contains
 
 
-def test_required_inputs(monkeypatch):
-    monkeypatch.setenv(Inputs.ID, '복권 계정 아이디')
-    monkeypatch.setenv(Inputs.PASSWORD, '복권 계정 비밀번호')
+def test_all_inputs(monkeypatch):
+    monkeypatch.setenv('LOTTERY_ACCOUNT_ID', '복권 계정 아이디')
+    monkeypatch.setenv('LOTTERY_ACCOUNT_PASSWORD', '복권 계정 비밀번호')
+    monkeypatch.setenv('SEARCH_START_DATE', '2022-12-31')
+    monkeypatch.setenv('SEARCH_END_DATE', '2023-01-01')
 
-    actual = Inputs.to_account()
+    account, search_dates = inputs()
 
-    assert actual.id == '복권 계정 아이디'
-    assert actual.password == '복권 계정 비밀번호'  # todo
-
-
-def test_optional_inputs(monkeypatch):
-    monkeypatch.setenv(Inputs.START_DATE, '2022-12-31')
-    monkeypatch.setenv(Inputs.END_DATE, '2023-01-01')
-
-    actual = Inputs.to_search_dates()
-
-    assert actual.start == date(2022, 12, 31)
-    assert actual.end == date(2023, 1, 1)
+    assert account.id == '복권 계정 아이디'
+    assert account.password == '복권 계정 비밀번호'  # todo
+    assert search_dates.start == date(2022, 12, 31)
+    assert search_dates.end == date(2023, 1, 1)
 
 
-def test_optional_not_inputs(monkeypatch):
-    actual = Inputs.to_search_dates()
+def test_optional_search_dates_default_is_today(monkeypatch):
+    monkeypatch.setenv('LOTTERY_ACCOUNT_ID', '복권 계정 아이디')
+    monkeypatch.setenv('LOTTERY_ACCOUNT_PASSWORD', '복권 계정 비밀번호')
 
-    assert actual.start == date.today()
-    assert actual.end == date.today()
+    _, search_dates = inputs()
+
+    assert search_dates.start == date.today()
+    assert search_dates.end == date.today()
 
 
 def test_outputs(github_output_contains):
