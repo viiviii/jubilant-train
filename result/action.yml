@@ -23,8 +23,12 @@ outputs:
     description: '조회 종료 날짜(YYYY-MM-DD)'
     value: ${{ steps.search-result.outputs.end-date }}
   summary:
-    description: '조회된 구매/당첨내역을 요약한 결과'
+    description: '요약된 조회 결과'
     value: ${{ steps.search-result.outputs.summary }}
+  table:
+    description: '테이블 형태의 조회 결과'
+    value: ${{ steps.search-result.outputs.table }}
+
 
 runs:
   using: 'composite'

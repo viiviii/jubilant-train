@@ -8,7 +8,6 @@ from lotto.lotto import Lotto
 from lotto.secret import Secret
 from lotto.types import DateRange, Table
 from result.main import outputs, result, inputs
-from result.summary import Summary
 
 
 @pytest.fixture
@@ -54,37 +53,40 @@ def test_optional_search_dates_default_is_today(monkeypatch):
 def test_outputs(github_output_contains):
     outputs(
         search_dates=DateRange(date(2020, 1, 1), date(2023, 12, 31)),
-        summaries=[
-            Summary(round='9회', draw_date='2023-01-01',
-                    prize='0원', quantity='3장')
-        ],
+        table=Table(
+            headers=['구입일자', '복권명', '회차', '선택번호/복권번호',
+                     '구입매수', '당첨결과', '당첨금', '추첨일'],
+            rows=[['2022-12-28', '로또6/45', '1071', '51738 ...',
+                   '3', '미추첨', '-', '2023-01-01']],
+        )
     )
 
     assert github_output_contains('start-date=2020-01-01')
     assert github_output_contains('end-date=2023-12-31')
     assert github_output_contains(
+        "table={'"
+        "headers': ['구입일자', '복권명', '회차', '선택번호/복권번호',"
+        " '구입매수', '당첨결과', '당첨금', '추첨일'], "
+        "'rows': [['2022-12-28', '로또6/45', '1071', '51738 ...',"
+        " '3', '미추첨', '-', '2023-01-01']]}")
+    assert github_output_contains(
         "summary=["
-        "{'round': '9회', 'draw_date': '2023-01-01', "
-        "'prize': '0원', 'quantity': '3장'}"
+        "{'round': '1071회', 'draw_date': '2023-01-01',"
+        " 'prize': '0원', 'quantity': '3장'}"
         "]"
     )
 
 
-def test_result(github_output_contains):
+@mock.patch('result.main.outputs')
+def test_result(mock_main_outputs):
     # given
+    table = Table(headers=[], rows=[[]])
+    account = Account('user-id', Secret('abcde!2@4%'))
+    search_dates = DateRange(date(2022, 12, 31), date(2023, 1, 1))
+
     mock_lotto = mock.MagicMock(spec=Lotto)
     mock_lotto.login.return_value = None
-    mock_lotto.result.return_value = Table(
-        headers=['구입일자', '복권명', '회차', '선택번호/복권번호',
-                 '구입매수', '당첨결과', '당첨금', '추첨일'],
-        rows=[[
-            '2023-01-01', '로또6/45', '3', '51738 11491 27411 72232 76893 71219',
-            '1', '미추첨', '-', '2023-01-05'
-        ]]
-    )
-
-    account = Account('fake-user-id', Secret('abcde!2@4%'))
-    search_dates = DateRange(date(2022, 12, 31), date(2023, 1, 1))
+    mock_lotto.result.return_value = table
 
     # when
     result(lotto=mock_lotto, account=account, search_dates=search_dates)
@@ -92,12 +94,4 @@ def test_result(github_output_contains):
     # then
     mock_lotto.login.assert_called_once_with(account)
     mock_lotto.result.assert_called_once_with(search_dates)
-
-    assert github_output_contains('start-date=2022-12-31')
-    assert github_output_contains('end-date=2023-01-01')
-    assert github_output_contains(
-        "summary=["
-        "{'round': '3회', 'draw_date': '2023-01-05', "
-        "'prize': '0원', 'quantity': '1장'}"
-        "]"
-    )
+    mock_main_outputs.assert_called_once_with(search_dates, table)
