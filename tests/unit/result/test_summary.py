@@ -1,6 +1,4 @@
-import pytest
-
-from result.summary import group_by_round, prize_to_int, Summary
+from result.summary import group_by_round, Summary, total_prize, total_quantity
 
 
 def test_group_by_round():
@@ -24,15 +22,16 @@ def test_group_by_round():
     actual = group_by_round(buys)
 
     assert actual == [
-        Summary(round='1054', draw_date='2023-02-11', prize=0, quantity=1),
-        Summary(round='1053', draw_date='2023-02-04', prize=55000,
-                quantity=111)
+        Summary('1054회', '2023-02-11', '0원', '1장'),
+        Summary('1053회', '2023-02-04', '55,000원', '111장')
     ]
 
 
-@pytest.mark.parametrize(
-    'prize, expected',
-    [('', 0), ('-', 0), ('1,000원', 1000), ('$1,234,567', 1234567)]
-)
-def test_prize_to_int(prize, expected):
-    assert prize_to_int(prize) == expected
+def test_total_quantity():
+    quantities = ['0', '1', '11', '111']
+    return total_quantity(quantities) == '111장'
+
+
+def test_total_prize():
+    prizes = ['-', '5,000원', '1,111,111원']
+    assert total_prize(prizes) == '1,116,111원'

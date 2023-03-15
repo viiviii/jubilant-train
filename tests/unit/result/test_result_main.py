@@ -55,7 +55,8 @@ def test_outputs(github_output_contains):
     outputs(
         search_dates=DateRange(date(2020, 1, 1), date(2023, 12, 31)),
         summaries=[
-            Summary(round='9', draw_date='2023-01-01', prize=0, quantity=3)
+            Summary(round='9회', draw_date='2023-01-01',
+                    prize='0원', quantity='3장')
         ],
     )
 
@@ -63,7 +64,8 @@ def test_outputs(github_output_contains):
     assert github_output_contains('end-date=2023-12-31')
     assert github_output_contains(
         "summary=["
-        "{'round': '9', 'draw_date': '2023-01-01', 'prize': 0, 'quantity': 3}"
+        "{'round': '9회', 'draw_date': '2023-01-01', "
+        "'prize': '0원', 'quantity': '3장'}"
         "]"
     )
 
@@ -94,6 +96,7 @@ def test_result(github_output_contains):
     assert github_output_contains('end-date=2023-01-01')
     assert github_output_contains(
         "summary=["
-        "{'round': '3', 'draw_date': '2023-01-05', 'prize': 0, 'quantity': 1}"
+        "{'round': '3회', 'draw_date': '2023-01-05', "
+        "'prize': '0원', 'quantity': '1장'}"
         "]"
     )
