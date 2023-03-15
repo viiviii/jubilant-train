@@ -57,11 +57,17 @@ def test_outputs(github_output_contains):
 
 
 @mock.patch('sends.github.main.create')
-def test_send(mock_create, github_output_contains):
-    mock_create.return_value = {'number': '1'}
+@mock.patch('sends.github.main.outputs')
+def test_send(mock_outputs, mock_create):
+    # given
     issue = Issue(Secret('token'), 'octocat/example', '제목', '내용', '라벨')
+    response = {'number': '1'}
 
+    mock_create.return_value = response
+
+    # when
     send(issue)
 
+    # then
     mock_create.assert_called_once_with(issue)
-    assert github_output_contains('number=1')
+    mock_outputs.assert_called_once_with(response)
