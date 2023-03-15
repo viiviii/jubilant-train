@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Optional, List
 
 import pytest
@@ -38,3 +39,14 @@ class TestTable:
 
         assert len(actual) == 1
         assert actual[0] == {'이름': '', '나이': ''}
+
+    def test_as_dict(self, create_table):
+        table = create_table(
+            headers=['이름', '나이'],
+            rows=[['박덕배', '22'], ['장평수', '7']]
+        )
+
+        actual = asdict(table)
+
+        assert actual == {'headers': ['이름', '나이'],
+                          'rows': [['박덕배', '22'], ['장평수', '7']]}

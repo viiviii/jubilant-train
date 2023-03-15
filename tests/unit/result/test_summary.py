@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from result.summary import group_by_round, Summary, total_prize, total_quantity
 
 
@@ -35,3 +37,15 @@ def test_total_quantity():
 def test_total_prize():
     prizes = ['-', '5,000원', '1,111,111원']
     assert total_prize(prizes) == '1,116,111원'
+
+
+def test_as_dict():
+    summary = Summary(
+        round='1071회', draw_date='2023-01-01',
+        prize='5,000원', quantity='10장'
+    )
+
+    actual = asdict(summary)
+
+    assert actual == {'round': '1071회', 'draw_date': '2023-01-01',
+                      'prize': '5,000원', 'quantity': '10장', }
