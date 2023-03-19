@@ -1,29 +1,11 @@
 from unittest import mock
 
-import pytest
-
 from lotto.secret import Secret
 from sends.github.issue import Issue
 from sends.github.main import inputs, outputs, send
 
 
-@pytest.fixture
-def github_output(tmp_path, monkeypatch):
-    path = tmp_path / "outputs.txt"
-    monkeypatch.setenv('GITHUB_OUTPUT', str(path))
-
-    return path
-
-
-@pytest.fixture
-def github_output_contains(github_output):
-    def contains(expected):
-        return f'{expected}\n' in github_output.read_text()
-
-    return contains
-
-
-def test_all_inputs(monkeypatch):
+def test_inputs(monkeypatch):
     monkeypatch.setenv('ISSUE_TOKEN', '토큰')
     monkeypatch.setenv('ISSUE_REPOSITORY', '리포')
     monkeypatch.setenv('ISSUE_TITLE', '타이틀')

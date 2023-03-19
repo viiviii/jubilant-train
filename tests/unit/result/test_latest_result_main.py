@@ -2,29 +2,10 @@ from datetime import date
 from unittest import mock
 from unittest.mock import ANY
 
-import pytest
-
 from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.secret import Secret
-from lotto.types import Table
 from result.latest.main import latest_saturday, latest, inputs, latest_result
-
-
-@pytest.fixture
-def github_output(tmp_path, monkeypatch):
-    path = tmp_path / "outputs.txt"
-    monkeypatch.setenv('GITHUB_OUTPUT', str(path))
-
-    return path
-
-
-@pytest.fixture
-def github_output_contains(github_output):
-    def contains(expected):
-        return f'{expected}\n' in github_output.read_text()
-
-    return contains
 
 
 def test_latest_saturday():
@@ -59,19 +40,15 @@ def test_inputs(monkeypatch):
 @mock.patch('result.latest.main.result')
 def test_result(mock_result):
     # given
-    table = Table(headers=[], rows=[[]])
     account = Account('user-id', Secret('abcde!2@4%'))
-
-    mock_lotto = mock.MagicMock(spec=Lotto)
-    mock_lotto.login.return_value = None
-    mock_lotto.result.return_value = table
+    search_dates_is_latest = latest()
 
     # when
-    latest_result(lotto=mock_lotto, account=account)
+    latest_result(lotto=mock.Mock(spec=Lotto), account=account)
 
     # then
     mock_result.assert_called_once_with(
         lotto=ANY,
         account=account,
-        search_dates=latest()
+        search_dates=search_dates_is_latest
     )

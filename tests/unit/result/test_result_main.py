@@ -1,8 +1,6 @@
 from datetime import date
 from unittest import mock
 
-import pytest
-
 from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.secret import Secret
@@ -10,23 +8,7 @@ from lotto.types import DateRange, Table
 from result.main import outputs, result, inputs
 
 
-@pytest.fixture
-def github_output(tmp_path, monkeypatch):
-    path = tmp_path / "outputs.txt"
-    monkeypatch.setenv('GITHUB_OUTPUT', str(path))
-
-    return path
-
-
-@pytest.fixture
-def github_output_contains(github_output):
-    def contains(expected):
-        return f'{expected}\n' in github_output.read_text()
-
-    return contains
-
-
-def test_all_inputs(monkeypatch):
+def test_inputs(monkeypatch):
     monkeypatch.setenv('LOTTERY_ACCOUNT_ID', '복권 계정 아이디')
     monkeypatch.setenv('LOTTERY_ACCOUNT_PASSWORD', '복권 계정 비밀번호')
     monkeypatch.setenv('SEARCH_START_DATE', '2022-12-31')
