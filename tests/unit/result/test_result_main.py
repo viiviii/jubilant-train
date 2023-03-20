@@ -33,13 +33,13 @@ def test_optional_search_dates_default_is_today(monkeypatch):
 
 
 def test_outputs(github_output_contains):
+    # @formatter:off
     outputs(
         search_dates=DateRange(date(2020, 1, 1), date(2023, 12, 31)),
         table=Table(
-            headers=['구입일자', '복권명', '회차', '선택번호/복권번호',
-                     '구입매수', '당첨결과', '당첨금', '추첨일'],
-            rows=[['2022-12-28', '로또6/45', '1071', '51738 ...',
-                   '3', '미추첨', '-', '2023-01-01']],
+            headers=['구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'], # noqa
+            rows=[['2022-12-28', '로또6/45', '1071', '51738 ...', '1', '미추첨', '-', '2023-01-01'], # noqa
+                  ['2022-12-28', '로또6/45', '1071', '11001 ...', '2', '미추첨', '-', '2023-01-01']], # noqa
         )
     )
 
@@ -47,16 +47,19 @@ def test_outputs(github_output_contains):
     assert github_output_contains('end-date=2023-12-31')
     assert github_output_contains(
         "table={'"
-        "headers': ['구입일자', '복권명', '회차', '선택번호/복권번호',"
-        " '구입매수', '당첨결과', '당첨금', '추첨일'], "
-        "'rows': [['2022-12-28', '로또6/45', '1071', '51738 ...',"
-        " '3', '미추첨', '-', '2023-01-01']]}")
+        "headers': ["
+        "'구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'"
+        "], "
+        "'rows': ["
+        "['2022-12-28', '로또6/45', '1071', '51738 ...', '1', '미추첨', '-', '2023-01-01'], " # noqa
+        "['2022-12-28', '로또6/45', '1071', '11001 ...', '2', '미추첨', '-', '2023-01-01']" # noqa
+        "]}")
     assert github_output_contains(
         "summary=["
-        "{'round': '1071회', 'draw_date': '2023-01-01',"
-        " 'prize': '0원', 'quantity': '3장'}"
+        "{'round': '1071회', 'draw_date': '2023-01-01', 'prize': '0원', 'quantity': '3장'}" # noqa
         "]"
     )
+    # @formatter:on
 
 
 @mock.patch('result.main.outputs')
