@@ -5,11 +5,9 @@ inputs:
   id:
     description: '동행복권 계정 아이디'
     required: true
-    default: ${{ secrets.LOTTERY_ACCOUNT_ID}}
   password:
     description: '동행복권 계정 비밀번호'
     required: true
-    default: ${{ secrets.LOTTERY_ACCOUNT_PASSWORD}}
   start-date:
     description: '조회 시작 날짜(YYYY-MM-DD)'
   end-date:

@@ -1,0 +1,36 @@
+name: '직전 회차 결과 조회'
+description: '가장 최근 회차의 구매/당첨내역을 조회한다'
+
+inputs:
+  id:
+    description: '동행복권 계정 아이디'
+    required: true
+  password:
+    description: '동행복권 계정 비밀번호'
+    required: true
+
+outputs:
+  start-date:
+    description: '조회 시작 날짜(YYYY-MM-DD)'
+    value: ${{ steps.search-latest-result.outputs.start-date }}
+  end-date:
+    description: '조회 종료 날짜(YYYY-MM-DD)'
+    value: ${{ steps.search-latest-result.outputs.end-date }}
+  summary:
+    description: '요약된 조회 결과'
+    value: ${{ steps.search-latest-result.outputs.summary }}
+  table:
+    description: '테이블 형태의 조회 결과'
+    value: ${{ steps.search-latest-result.outputs.table }}
+
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '직전 회차 결괴를 조회한다'
+      id: search-latest-result
+      env:
+        LOTTERY_ACCOUNT_ID: ${{ inputs.id }}
+        LOTTERY_ACCOUNT_PASSWORD: ${{ inputs.password }}
+      shell: bash
+      run: python -m result.latest.main
