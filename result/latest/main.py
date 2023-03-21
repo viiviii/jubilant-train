@@ -1,3 +1,5 @@
+import os
+from dataclasses import asdict
 from datetime import date, timedelta
 
 import env
@@ -5,8 +7,8 @@ from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.site.drivers import headless_chrome
 from lotto.site.site import Site
-from lotto.types import DateRange
-from result.main import result
+from lotto.types import DateRange, Table
+from result.summary import Summary
 
 
 def latest_saturday(today: date) -> date:
@@ -31,8 +33,21 @@ def inputs():
     return env.to_account()
 
 
+def outputs(search_dates: DateRange, table: Table) -> None:
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+        print(f'start-date={search_dates.start}', file=fh)
+        print(f'end-date={search_dates.end}', file=fh)
+        print(f'summary={asdict(Summary.from_table(table))}', file=fh)
+        print(f'table={asdict(table)}', file=fh)
+
+
 def latest_result(lotto: Lotto, account: Account) -> None:
-    result(lotto=lotto, account=account, search_dates=latest())
+    latest_dates = latest()
+
+    lotto.login(account)
+    buys = lotto.result(dates=latest_dates)
+
+    outputs(search_dates=latest_dates, table=buys)
 
 
 if __name__ == '__main__':
