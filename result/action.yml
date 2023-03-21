@@ -33,4 +33,4 @@ runs:
         LOTTERY_ACCOUNT_ID: ${{ inputs.id }}
         LOTTERY_ACCOUNT_PASSWORD: ${{ inputs.password }}
       shell: bash
-      run: python -m result.latest.main
+      run: python -m result.main

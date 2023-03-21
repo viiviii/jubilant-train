@@ -5,7 +5,7 @@ from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.secret import Secret
 from lotto.types import DateRange, Table
-from result.latest.main import latest_saturday, latest, inputs, latest_result, \
+from result.main import latest_saturday, latest, inputs, latest_result, \
     outputs
 
 
@@ -69,7 +69,7 @@ def test_outputs(github_output_contains):
     # @formatter:on
 
 
-@mock.patch('result.latest.main.outputs')
+@mock.patch('result.main.outputs')
 def test_result(mock_main_outputs):
     # given
     table = Table(headers=[], rows=[])
