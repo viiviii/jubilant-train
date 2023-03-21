@@ -15,6 +15,16 @@ class TestTable:
 
         return builder
 
+    def test_values(self, create_table):
+        table = create_table(
+            headers=['이름', '나이'],
+            rows=[['박덕배', '22'], ['장평수', '7']]
+        )
+
+        actual = table.values('이름')
+
+        assert actual == ['박덕배', '장평수']
+
     def test_zip(self, create_table):
         headers = ['이름', '나이']
         rows = [['박덕배', '22'], ['장평수', '7']]
