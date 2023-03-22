@@ -1,6 +1,8 @@
 import os
+import secrets
 from dataclasses import asdict
 from datetime import date, timedelta
+from typing import IO
 
 import env
 from lotto.account import Account
@@ -8,6 +10,7 @@ from lotto.lotto import Lotto
 from lotto.site.drivers import headless_chrome
 from lotto.site.site import Site
 from lotto.types import DateRange, Table
+from result import markdown
 from result.summary import Summary
 
 
@@ -38,7 +41,15 @@ def outputs(search_dates: DateRange, table: Table) -> None:
         print(f'start-date={search_dates.start}', file=fh)
         print(f'end-date={search_dates.end}', file=fh)
         print(f'summary={asdict(Summary.from_table(table))}', file=fh)
-        print(f'table={asdict(table)}', file=fh)
+        _output_multiline_value('table', markdown.from_table(table), file=fh)
+
+
+def _output_multiline_value(name: str, value: str, file: IO[str]) -> None:
+    delimiter = secrets.token_hex(8)
+
+    print(f'{name}<<{delimiter}', file=file)
+    print(value, file=file)
+    print(delimiter, file=file)
 
 
 def latest_result(lotto: Lotto, account: Account) -> None:

@@ -1,4 +1,5 @@
 from datetime import date
+from textwrap import dedent
 from unittest import mock
 
 import pytest
@@ -82,21 +83,21 @@ def test_output_summary(outputs, github_output_contains):
     )
 
 
-def test_output_table(outputs, github_output_contains):
+def test_output_table(outputs, assert_contains_multiline_github_output):
     # @formatter:off
     outputs(
         header=['구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'],  # noqa
-        rows=[['2022-12-28', '로또6/45', '1071', '51738 ...', '2', '미추첨', '-', '2023-01-01']] # noqa
+        rows=[['2022-12-28', '로또6/45', '1071', '00000', '2', '미추첨', '-', '2023-01-01']] # noqa
     )
 
-    assert github_output_contains(
-        "table={'"
-        "headers': ["
-        "'구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'"
-        "], "
-        "'rows': ["
-        "['2022-12-28', '로또6/45', '1071', '51738 ...', '2', '미추첨', '-', '2023-01-01']" # noqa
-        "]}"
+    assert_contains_multiline_github_output(
+        name='table',
+        value=dedent("""
+        구입일자|복권명|회차|선택번호/복권번호|구입매수|당첨결과|당첨금|추첨일
+        :---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:
+        2022-12-28|로또6/45|1071|00000|2|미추첨|-|2023-01-01
+        """)
+
     )
     # @formatter:on
 
