@@ -32,10 +32,10 @@ def test_label_is_optional_input(monkeypatch):
     assert not actual.label
 
 
-def test_outputs(github_output_contains):
+def test_outputs(assert_contains_github_output):
     outputs({'number': '679231'})
 
-    assert github_output_contains('number=679231')
+    assert_contains_github_output(name='number', value='679231')
 
 
 @mock.patch('sends.github.main.create')

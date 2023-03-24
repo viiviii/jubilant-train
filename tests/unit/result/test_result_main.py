@@ -1,12 +1,14 @@
 from datetime import date
 from unittest import mock
 
+import pytest
+
 from lotto.account import Account
 from lotto.lotto import Lotto
 from lotto.secret import Secret
 from lotto.types import DateRange, Table
-from result.main import latest_saturday, latest, inputs, latest_result, \
-    outputs
+from result import main
+from result.main import latest_saturday, latest, inputs, latest_result
 
 
 def test_latest_saturday():
@@ -38,35 +40,63 @@ def test_inputs(monkeypatch):
     assert account.password == '복권 계정 비밀번호'
 
 
-def test_outputs(github_output_contains):
-    # @formatter:off
-    outputs(
-        search_dates=DateRange(date(2020, 1, 1), date(2023, 12, 31)),
-        table=Table(
-            headers=['구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'], # noqa
-            rows=[['2022-12-28', '로또6/45', '1071', '51738 ...', '2', '미추첨', '-', '2023-01-01'], # noqa
-                  ['2022-12-28', '로또6/45', '1071', '11001 ...', '3', '미추첨', '-', '2023-01-01']], # noqa
+@pytest.fixture
+def outputs():
+    def builder(search_dates=None, header=None, rows=None):
+        # @formatter:off
+        return main.outputs(
+            search_dates=search_dates or DateRange(date(2020, 1, 1), date(2023, 12, 31)), # noqa
+            table=Table(
+                headers=header or ['구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'], # noqa
+                rows=rows or [['2022-12-28', '로또6/45', '1071', '51738 ...', '2', '미추첨', '-', '2023-01-01'], # noqa
+                      ['2022-12-28', '로또6/45', '1071', '11001 ...', '3', '미추첨', '-', '2023-01-01']], # noqa
+            )
         )
+        # @formatter:on
+
+    return builder
+
+
+def test_output_dates(outputs, assert_contains_github_output):
+    outputs(search_dates=DateRange(
+        start=date(2020, 1, 1),
+        end=date(2023, 12, 31)
+    ))
+
+    assert_contains_github_output(name='start-date', value='2020-01-01')
+    assert_contains_github_output(name='end-date', value='2023-12-31')
+
+
+def test_output_summary(outputs, assert_contains_github_output):
+    outputs(
+        header=['복권명', '회차', '추첨일', '당첨금', '구입매수'],
+        rows=[['로또6/45', '1071', '2023-01-01', '-', '2'],
+              ['로또6/45', '1071', '2023-01-01', '-', '3']]
     )
 
-    assert github_output_contains('start-date=2020-01-01')
-    assert github_output_contains('end-date=2023-12-31')
-    assert github_output_contains(
-        "summary={"
-        "'name': '로또6/45', 'round': '1071회', 'draw_date': '2023-01-01', 'prize': '0원', 'quantity': '5장'" # noqa
-        "}"
+    assert_contains_github_output(
+        name="summary",
+        value="{"
+              "'name': '로또6/45', 'round': '1071회', 'draw_date': '2023-01-01',"
+              " 'prize': '0원', 'quantity': '5장'"
+              "}"
     )
-    assert github_output_contains(
-        "table={'"
-        "headers': ["
-        "'구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'"
-        "], "
-        "'rows': ["
-        "['2022-12-28', '로또6/45', '1071', '51738 ...', '2', '미추첨', '-', '2023-01-01'], " # noqa
-        "['2022-12-28', '로또6/45', '1071', '11001 ...', '3', '미추첨', '-', '2023-01-01']" # noqa
-        "]}"
+
+
+def test_output_table(outputs, assert_contains_multiline_github_output):
+    # @formatter:off
+    outputs(
+        header=['구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'],  # noqa
+        rows=[['2022-12-28', '로또6/45', '1071', '00000', '2', '미추첨', '-', '2023-01-01']] # noqa
     )
     # @formatter:on
+
+    assert_contains_multiline_github_output(
+        name='table',
+        value=('구입일자|복권명|회차|선택번호/복권번호|구입매수|당첨결과|당첨금|추첨일\n'
+               ':---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:\n'
+               '2022-12-28|로또6/45|1071|00000|2|미추첨|-|2023-01-01\n')
+    )
 
 
 @mock.patch('result.main.outputs')
