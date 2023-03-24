@@ -10,10 +10,6 @@ jobs:
   test:
     runs-on: macos-latest
 
-    permissions:
-      contents: read
-      issues: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -23,10 +19,7 @@ jobs:
 
       - name: Run tests
         env:
-          # Github 기본 환경 변수
-          ISSUE_TOKEN: ${{ github.token }}
-          ISSUE_REPOSITORY: ${{ github.repository }}
-          # 설정이 필요한 환경 변수
+          # GitHub Repository [Settings] > [Security | Secrets and variables] > [Actions | Secrets]
           LOTTERY_ACCOUNT_ID: ${{ secrets.LOTTERY_ACCOUNT_ID }}
           LOTTERY_ACCOUNT_PASSWORD: ${{ secrets.LOTTERY_ACCOUNT_PASSWORD }}
         run: pytest -m "not buy_required"
