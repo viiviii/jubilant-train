@@ -14,10 +14,10 @@ on:
     outputs:
       start-date:
         description: '조회 시작 날짜(YYYY-MM-DD)'
-        value: ${{ jobs.result.outputs.start-date }}
+        value: ${{ fromJSON(jobs.result.outputs.search-dates).start }}
       end-date:
         description: '조회 종료 날짜(YYYY-MM-DD)'
-        value: ${{ jobs.result.outputs.end-date }}
+        value: ${{ fromJSON(jobs.result.outputs.search-dates).end }}
       name:
         description: '조회한 복권의 이름'
         value: ${{ fromJSON(jobs.result.outputs.summary).name }}
@@ -43,8 +43,7 @@ jobs:
     name: '직전 회차 결과 조회'
     runs-on: macos-latest
     outputs:
-      start-date: ${{ steps.result.outputs.start-date }}
-      end-date: ${{ steps.result.outputs.end-date }}
+      search-dates: ${{ steps.result.outputs.search-dates }}
       summary: ${{ steps.result.outputs.summary }}
       table: ${{ steps.result.outputs.table }}
     steps:

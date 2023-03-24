@@ -1,8 +1,14 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import NamedTuple, List
+from typing import List, NamedTuple
 
-DateRange = NamedTuple('DateRange', [('start', date), ('end', date)])
+
+class DateRange(NamedTuple):
+    start: date
+    end: date
+
+    def as_dict(self) -> dict:
+        return {k: v.isoformat() for k, v in self._asdict().items()}
 
 
 @dataclass(frozen=True)

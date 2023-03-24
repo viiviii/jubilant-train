@@ -1,9 +1,20 @@
 from dataclasses import asdict
+from datetime import date
 from typing import Optional, List
 
 import pytest
 
-from lotto.types import Table
+from lotto.types import Table, DateRange
+
+
+class TestDateRange:
+
+    def test_as_dict(self):
+        dates = DateRange(start=date(2020, 1, 1), end=date(2023, 12, 31))
+
+        actual = dates.as_dict()
+
+        assert actual == {'start': '2020-01-01', 'end': '2023-12-31'}
 
 
 class TestTable:
