@@ -1,5 +1,4 @@
 from datetime import date
-from textwrap import dedent
 from unittest import mock
 
 import pytest
@@ -58,28 +57,29 @@ def outputs():
     return builder
 
 
-def test_output_dates(outputs, github_output_contains):
+def test_output_dates(outputs, assert_contains_github_output):
     outputs(search_dates=DateRange(
         start=date(2020, 1, 1),
         end=date(2023, 12, 31)
     ))
 
-    assert github_output_contains('start-date=2020-01-01')
-    assert github_output_contains('end-date=2023-12-31')
+    assert_contains_github_output(name='start-date', value='2020-01-01')
+    assert_contains_github_output(name='end-date', value='2023-12-31')
 
 
-def test_output_summary(outputs, github_output_contains):
+def test_output_summary(outputs, assert_contains_github_output):
     outputs(
-        header=['복권명', '회차', '추첨일', '구입매수', '당첨금'],
-        rows=[['로또6/45', '1071', '2023-01-01', '2', '-'],
-              ['로또6/45', '1071', '2023-01-01', '3', '-']]
+        header=['복권명', '회차', '추첨일', '당첨금', '구입매수'],
+        rows=[['로또6/45', '1071', '2023-01-01', '-', '2'],
+              ['로또6/45', '1071', '2023-01-01', '-', '3']]
     )
 
-    assert github_output_contains(
-        "summary={"
-        "'name': '로또6/45', 'round': '1071회', 'draw_date': '2023-01-01',"
-        " 'prize': '0원', 'quantity': '5장'"
-        "}"
+    assert_contains_github_output(
+        name="summary",
+        value="{"
+              "'name': '로또6/45', 'round': '1071회', 'draw_date': '2023-01-01',"
+              " 'prize': '0원', 'quantity': '5장'"
+              "}"
     )
 
 
@@ -89,17 +89,14 @@ def test_output_table(outputs, assert_contains_multiline_github_output):
         header=['구입일자', '복권명', '회차', '선택번호/복권번호', '구입매수', '당첨결과', '당첨금', '추첨일'],  # noqa
         rows=[['2022-12-28', '로또6/45', '1071', '00000', '2', '미추첨', '-', '2023-01-01']] # noqa
     )
+    # @formatter:on
 
     assert_contains_multiline_github_output(
         name='table',
-        value=dedent("""
-        구입일자|복권명|회차|선택번호/복권번호|구입매수|당첨결과|당첨금|추첨일
-        :---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:
-        2022-12-28|로또6/45|1071|00000|2|미추첨|-|2023-01-01
-        """)
-
+        value=('구입일자|복권명|회차|선택번호/복권번호|구입매수|당첨결과|당첨금|추첨일\n'
+               ':---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:\n'
+               '2022-12-28|로또6/45|1071|00000|2|미추첨|-|2023-01-01\n')
     )
-    # @formatter:on
 
 
 @mock.patch('result.main.outputs')
