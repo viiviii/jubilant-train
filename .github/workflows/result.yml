@@ -1,0 +1,65 @@
+name: '직전 회차 결과 조회'
+
+on:
+  workflow_call:
+    # input
+    secrets:
+      id:
+        description: '동행복권 계정 아이디'
+        required: true
+      password:
+        description: '동행복권 계정 비밀번호'
+        required: true
+    # output
+    outputs:
+      start-date:
+        description: '조회 시작 날짜(YYYY-MM-DD)'
+        value: ${{ jobs.result.outputs.start-date }}
+      end-date:
+        description: '조회 종료 날짜(YYYY-MM-DD)'
+        value: ${{ jobs.result.outputs.end-date }}
+      name:
+        description: '조회한 복권의 이름'
+        value: ${{ fromJSON(jobs.result.outputs.summary).name }}
+      round:
+        description: '조회한 복권의 회차'
+        value: ${{ fromJSON(jobs.result.outputs.summary).round }}
+      draw-date:
+        description: '조회한 회차의 추첨일'
+        value: ${{ fromJSON(jobs.result.outputs.summary).draw_date }}
+      prize:
+        description: '조회한 회차의 총 당첨금'
+        value: ${{ fromJSON(jobs.result.outputs.summary).prize }}
+      quantity:
+        description: '조회한 회차의 총 구입매수'
+        value: ${{ fromJSON(jobs.result.outputs.summary).quantity }}
+      table:
+        description: '마크다운 형식의 결과 테이블'
+        value: ${{ jobs.result.outputs.table }}
+
+
+jobs:
+  result:
+    name: '직전 회차 결과 조회'
+    runs-on: macos-latest
+    outputs:
+      start-date: ${{ steps.result.outputs.start-date }}
+      end-date: ${{ steps.result.outputs.end-date }}
+      summary: ${{ steps.result.outputs.summary }}
+      table: ${{ steps.result.outputs.table }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: viiviii/jubilant-train
+          ref: main # todo: 태그나 SHA 키로 변경
+
+      - name: Setup
+        uses: ./setup
+
+      - name: Get latest result
+        id: result
+        env:
+          LOTTERY_ACCOUNT_ID: ${{ secrets.id }}
+          LOTTERY_ACCOUNT_PASSWORD: ${{ secrets.password }}
+        run: python -m result.main
