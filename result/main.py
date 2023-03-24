@@ -38,8 +38,7 @@ def inputs():
 
 def outputs(search_dates: DateRange, table: Table) -> None:
     with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
-        print(f'start-date={search_dates.start}', file=fh)
-        print(f'end-date={search_dates.end}', file=fh)
+        print(f'search-dates={search_dates.as_dict()}', file=fh)
         print(f'summary={asdict(Summary.from_table(table))}', file=fh)
         _output_multiline_value('table', markdown.from_table(table), file=fh)
 

@@ -59,12 +59,13 @@ def outputs():
 
 def test_output_dates(outputs, assert_contains_github_output):
     outputs(search_dates=DateRange(
-        start=date(2020, 1, 1),
-        end=date(2023, 12, 31)
+        start=date(2020, 1, 1), end=date(2023, 12, 31)
     ))
 
-    assert_contains_github_output(name='start-date', value='2020-01-01')
-    assert_contains_github_output(name='end-date', value='2023-12-31')
+    assert_contains_github_output(
+        name="search-dates",
+        value="{'start': '2020-01-01', 'end': '2023-12-31'}"
+    )
 
 
 def test_output_summary(outputs, assert_contains_github_output):
