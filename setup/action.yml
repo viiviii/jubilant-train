@@ -16,4 +16,4 @@ runs:
         pip install -r requirements.txt
 
     - name: 'Selenium 사용을 위한 Chrome Driver 설치'
-      uses: nanasess/setup-chromedriver@v1.1.0
+      uses: nanasess/setup-chromedriver@v2
