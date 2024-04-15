@@ -1,0 +1,47 @@
+name: '로또 복권 구매'
+
+on:
+  workflow_call:
+    # input
+    secrets:
+      id:
+        description: '동행복권 계정 아이디'
+        required: true
+      password:
+        description: '동행복권 계정 비밀번호'
+        required: true
+    inputs:
+      amount:
+        description: '복권 구매 수량'
+        default: 1
+        required: false
+        type: number
+    # output
+    outputs:
+      total-price:
+        description: '총 구매 금액'
+        value: ${{ jobs.purchase.outputs.total-price }}
+
+
+jobs:
+  purchase:
+    name: '로또 복권 구매'
+    runs-on: macos-latest
+    outputs:
+      total-price: ${{ steps.result.outputs.total-price }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: viiviii/jubilant-train
+
+      - name: Setup
+        uses: ./setup
+
+      - name: Purchase lottery
+        id: result
+        env:
+          LOTTERY_ACCOUNT_ID: ${{ secrets.id }}
+          LOTTERY_ACCOUNT_PASSWORD: ${{ secrets.password }}
+          LOTTERY_AMOUNT: ${{ inputs.amount }}
+        run: python -m purchase.main
